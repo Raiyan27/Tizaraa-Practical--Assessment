@@ -6,6 +6,7 @@ import { calculateProductPrice } from "@/lib/pricing";
 import { PriceDisplay } from "@/components/ui/PriceDisplay";
 import { StockBadge } from "@/components/ui/StockBadge";
 import { getAvailableStock, checkVariantStock } from "@/lib/validation";
+import { StaticProductPreview } from "./StaticProductPreview";
 import Link from "next/link";
 
 interface SavedItemProps {
@@ -48,11 +49,12 @@ export function SavedItem({ item, onMoveToCart, onRemove }: SavedItemProps) {
   return (
     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
       <div className="flex gap-4">
-        {/* Product Image Placeholder */}
-        <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center shrink-0">
-          <div
-            className="w-12 h-12 rounded"
-            style={{ backgroundColor: colorVariant?.hex }}
+        {/* Static 3D Preview */}
+        <div className="shrink-0">
+          <StaticProductPreview
+            product={product}
+            selectedVariants={item.selectedVariants}
+            size={80}
           />
         </div>
 

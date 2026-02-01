@@ -7,6 +7,7 @@ import { PriceDisplay } from "@/components/ui/PriceDisplay";
 import { QuantitySelector } from "@/components/ui/QuantitySelector";
 import { StockBadge } from "@/components/ui/StockBadge";
 import { getAvailableStock } from "@/lib/validation";
+import { StaticProductPreview } from "./StaticProductPreview";
 import Link from "next/link";
 
 interface CartItemProps {
@@ -51,11 +52,12 @@ export function CartItem({
   return (
     <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
       <div className="flex gap-4">
-        {/* Product Image Placeholder */}
-        <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-          <div
-            className="w-16 h-16 rounded"
-            style={{ backgroundColor: colorVariant?.hex }}
+        {/* Static 3D Preview */}
+        <div className="shrink-0">
+          <StaticProductPreview
+            product={product}
+            selectedVariants={item.selectedVariants}
+            size={96}
           />
         </div>
 
@@ -78,10 +80,7 @@ export function CartItem({
               </div>
             </div>
             <div className="text-right">
-              <PriceDisplay
-                amount={price}
-                className="text-lg font-bold"
-              />
+              <PriceDisplay amount={price} className="text-lg font-bold" />
               {item.quantity > 1 && (
                 <div className="text-sm text-gray-500">
                   <PriceDisplay amount={price / item.quantity} /> each
