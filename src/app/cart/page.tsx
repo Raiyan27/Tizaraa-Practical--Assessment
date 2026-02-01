@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { useCartStore } from "@/store/cartStore";
 import { calculateCartSummary } from "@/lib/pricing";
 import { getPromoCodeByCode } from "@/data/promo-codes";
+import { getProductById } from "@/data/products";
 import { CartItem } from "@/components/cart/CartItem";
 import { SavedItem } from "@/components/cart/SavedItem";
 import { CartSummary } from "@/components/cart/CartSummary";
@@ -40,12 +42,16 @@ export default function CartPage() {
         throw new Error("Invalid promo code");
       }
       applyPromoCode(code);
+      toast.success(`Promo code "${code}" applied successfully!`);
     },
     [applyPromoCode],
   );
 
   const handleCheckout = useCallback(() => {
-    alert("Checkout functionality coming soon!");
+    toast("Checkout functionality coming soon!", {
+      icon: "🚧",
+      duration: 3000,
+    });
   }, []);
 
   // Memoize cart summary calculation to prevent unnecessary recalculations
@@ -72,35 +78,48 @@ export default function CartPage() {
 
   const handleRemoveItem = useCallback(
     (itemId: string) => {
+      const item = items.find((i) => i.id === itemId);
+      const productName = item ? getProductById(item.productId)?.name : "Item";
       removeItem(itemId);
+      toast.success(`${productName} removed from cart`);
     },
-    [removeItem],
+    [removeItem, items],
   );
 
   const handleSaveForLater = useCallback(
     (itemId: string) => {
+      const item = items.find((i) => i.id === itemId);
+      const productName = item ? getProductById(item.productId)?.name : "Item";
       saveForLater(itemId);
+      toast.success(`${productName} saved for later`);
     },
-    [saveForLater],
+    [saveForLater, items],
   );
 
   const handleMoveToCart = useCallback(
     (savedItemId: string) => {
+      const item = savedItems.find((i) => i.id === savedItemId);
+      const productName = item ? getProductById(item.productId)?.name : "Item";
       moveToCart(savedItemId);
+      toast.success(`${productName} moved to cart`);
     },
-    [moveToCart],
+    [moveToCart, savedItems],
   );
 
   const handleRemoveSavedItem = useCallback(
     (savedItemId: string) => {
+      const item = savedItems.find((i) => i.id === savedItemId);
+      const productName = item ? getProductById(item.productId)?.name : "Item";
       removeSavedItem(savedItemId);
+      toast.success(`${productName} removed from saved items`);
     },
-    [removeSavedItem],
+    [removeSavedItem, savedItems],
   );
 
   const handleRemovePromo = useCallback(
     (code: string) => {
       removePromoCode(code);
+      toast.success(`Promo code "${code}" removed`);
     },
     [removePromoCode],
   );
@@ -184,6 +203,7 @@ export default function CartPage() {
                       }
                       onRemove={() => handleRemoveItem(item.id)}
                       onSaveForLater={() => handleSaveForLater(item.id)}
+                      isLoading={isLoading}
                     />
                   ))}
                 </>
@@ -203,6 +223,7 @@ export default function CartPage() {
                         cartItems={items}
                         onMoveToCart={() => handleMoveToCart(item.id)}
                         onRemove={() => handleRemoveSavedItem(item.id)}
+                        isLoading={isLoading}
                       />
                     ))}
                   </div>
@@ -219,6 +240,7 @@ export default function CartPage() {
                   onApplyPromo={handleApplyPromo}
                   onRemovePromo={handleRemovePromo}
                   onCheckout={handleCheckout}
+                  isLoading={isLoading}
                 />
               </div>
             )}

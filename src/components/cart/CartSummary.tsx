@@ -13,6 +13,7 @@ interface CartSummaryProps {
   onApplyPromo: (code: string) => void;
   onRemovePromo: (code: string) => void;
   onCheckout: () => void;
+  isLoading?: boolean;
 }
 
 export const CartSummary = memo(function CartSummary({
@@ -21,6 +22,7 @@ export const CartSummary = memo(function CartSummary({
   onApplyPromo,
   onRemovePromo,
   onCheckout,
+  isLoading = false,
 }: CartSummaryProps) {
   const [promoInput, setPromoInput] = useState("");
   const [promoError, setPromoError] = useState("");
@@ -173,9 +175,15 @@ export const CartSummary = memo(function CartSummary({
               onKeyDown={handlePromoKeyDown}
               placeholder="Enter promo code"
               className="flex-1 text-sm"
+              disabled={isLoading}
             />
-            <Button onClick={handleApplyPromo} variant="secondary" size="sm">
-              Apply
+            <Button
+              onClick={handleApplyPromo}
+              variant="secondary"
+              size="sm"
+              disabled={isLoading}
+            >
+              {isLoading ? "Applying..." : "Apply"}
             </Button>
           </div>
           {promoError && (
@@ -189,8 +197,9 @@ export const CartSummary = memo(function CartSummary({
         onClick={handleCheckout}
         variant="primary"
         className="w-full mb-3"
+        disabled={isLoading}
       >
-        Proceed to Checkout
+        {isLoading ? "Processing..." : "Proceed to Checkout"}
       </Button>
 
       {/* Free Shipping Notice */}

@@ -20,6 +20,7 @@ import {
   MobileFilterDrawer,
 } from "@/components/filters";
 import { ProductCard } from "@/components/products/ProductCard";
+import { HomeProductGridSkeleton } from "@/components/ui/Skeleton";
 
 function ProductsPageContent() {
   const router = useRouter();
@@ -135,8 +136,48 @@ function ProductsPageContent() {
 
   if (!isInitialized) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header skeleton */}
+        <header className="bg-white shadow-sm sticky top-0 z-30">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
+              <div className="flex items-center gap-4">
+                <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-10 w-24 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main content skeleton */}
+        <div className="container mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+            {/* Filter sidebar skeleton */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 space-y-6">
+                <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
+                <div className="space-y-4">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="space-y-2">
+                      <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-8 w-full bg-gray-200 rounded animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Products grid skeleton */}
+            <div className="lg:col-span-3">
+              <div className="flex items-center justify-between mb-6">
+                <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+              <HomeProductGridSkeleton />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

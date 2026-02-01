@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 import { getProductById } from "@/data/products";
 import { useConfigurationStore } from "@/store/configurationStore";
 import { useCartStore } from "@/store/cartStore";
@@ -20,6 +21,8 @@ export default function ProductPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const productId = params.id as string;
+
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const {
     selectedVariants,
@@ -126,14 +129,19 @@ export default function ProductPage() {
     .map((m) => m.id);
 
   const handleAddToCart = async () => {
+    setIsAddingToCart(true);
     try {
       await addItem(productId, selectedVariants, quantity);
-      alert(`✓ Added to cart! (${quantity} item${quantity > 1 ? "s" : ""})`);
+      toast.success(
+        `✓ Added to cart! (${quantity} item${quantity > 1 ? "s" : ""})`,
+      );
       setQuantity(1);
     } catch (error) {
-      alert(
+      toast.error(
         `Error: ${error instanceof Error ? error.message : "Could not add to cart"}`,
       );
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
@@ -249,6 +257,7 @@ export default function ProductPage() {
               quantity={quantity}
               onQuantityChange={setQuantity}
               onAddToCart={handleAddToCart}
+              isLoading={isAddingToCart}
             />
           </div>
         </div>

@@ -16,6 +16,7 @@ interface SavedItemProps {
   cartItems?: CartItemType[];
   onMoveToCart: () => void;
   onRemove: () => void;
+  isLoading?: boolean;
 }
 
 export const SavedItem = memo(function SavedItem({
@@ -23,6 +24,7 @@ export const SavedItem = memo(function SavedItem({
   cartItems = [],
   onMoveToCart,
   onRemove,
+  isLoading = false,
 }: SavedItemProps) {
   const product = getProductById(item.productId);
 
@@ -123,17 +125,26 @@ export const SavedItem = memo(function SavedItem({
       <div className="px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-300 bg-gray-100 flex gap-2 sm:gap-3 text-xs sm:text-sm flex-shrink-0 whitespace-nowrap">
         <button
           onClick={handleMoveToCart}
-          disabled={!hasStock}
-          className="text-blue-600 hover:text-blue-700 font-medium disabled:text-gray-400 disabled:cursor-not-allowed active:text-blue-800"
+          disabled={!hasStock || isLoading}
+          className={`font-medium active:text-blue-800 ${
+            !hasStock || isLoading
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-blue-600 hover:text-blue-700"
+          }`}
         >
-          {hasStock ? "Move to Cart" : "Out of Stock"}
+          {isLoading ? "Moving..." : hasStock ? "Move to Cart" : "Out of Stock"}
         </button>
         <span className="text-gray-300">|</span>
         <button
           onClick={handleRemove}
-          className="text-red-600 hover:text-red-700 font-medium active:text-red-800"
+          disabled={isLoading}
+          className={`font-medium active:text-red-800 ${
+            isLoading
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-red-600 hover:text-red-700"
+          }`}
         >
-          Remove
+          {isLoading ? "Removing..." : "Remove"}
         </button>
       </div>
     </div>

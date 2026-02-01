@@ -16,6 +16,7 @@ interface CartItemProps {
   onUpdateQuantity: (quantity: number) => void;
   onRemove: () => void;
   onSaveForLater: () => void;
+  isLoading?: boolean;
 }
 
 export const CartItem = memo(function CartItem({
@@ -23,6 +24,7 @@ export const CartItem = memo(function CartItem({
   onUpdateQuantity,
   onRemove,
   onSaveForLater,
+  isLoading = false,
 }: CartItemProps) {
   const product = getProductById(item.productId);
 
@@ -117,26 +119,39 @@ export const CartItem = memo(function CartItem({
 
       {/* Fixed Action Bar at Bottom */}
       <div className="px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-2 sm:gap-3 flex-shrink-0">
-        <QuantitySelector
-          value={item.quantity}
-          onChange={handleQuantityChange}
-          min={1}
-          max={availableStock}
-        />
+        <div className={isLoading ? "opacity-50 pointer-events-none" : ""}>
+          <QuantitySelector
+            value={item.quantity}
+            onChange={handleQuantityChange}
+            min={1}
+            max={availableStock}
+            isLoading={isLoading}
+          />
+        </div>
 
         <div className="flex gap-2 sm:gap-3 text-xs sm:text-sm shrink-0 whitespace-nowrap">
           <button
             onClick={handleSaveForLater}
-            className="text-blue-600 hover:text-blue-700 font-medium active:text-blue-800"
+            disabled={isLoading}
+            className={`font-medium active:text-blue-800 ${
+              isLoading
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-blue-600 hover:text-blue-700"
+            }`}
           >
-            Save for later
+            {isLoading ? "Saving..." : "Save for later"}
           </button>
           <span className="text-gray-300">|</span>
           <button
             onClick={handleRemove}
-            className="text-red-600 hover:text-red-700 font-medium active:text-red-800"
+            disabled={isLoading}
+            className={`font-medium active:text-red-800 ${
+              isLoading
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-red-600 hover:text-red-700"
+            }`}
           >
-            Remove
+            {isLoading ? "Removing..." : "Remove"}
           </button>
         </div>
       </div>

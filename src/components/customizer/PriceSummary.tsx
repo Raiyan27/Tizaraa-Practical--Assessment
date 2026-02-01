@@ -15,6 +15,7 @@ interface PriceSummaryProps {
   quantity: number;
   onQuantityChange: (quantity: number) => void;
   onAddToCart: () => void;
+  isLoading?: boolean;
 }
 
 export function PriceSummary({
@@ -23,6 +24,7 @@ export function PriceSummary({
   quantity,
   onQuantityChange,
   onAddToCart,
+  isLoading = false,
 }: PriceSummaryProps) {
   const { items } = useCartStore();
 
@@ -120,6 +122,7 @@ export function PriceSummary({
           value={quantity}
           onChange={onQuantityChange}
           max={Math.min(99, availableStock)}
+          isLoading={isLoading}
         />
         {availableStock < 99 && availableStock > 0 && (
           <p className="text-xs text-amber-600 font-medium">
@@ -153,9 +156,13 @@ export function PriceSummary({
           onClick={onAddToCart}
           className="w-full"
           size="lg"
-          disabled={availableStock === 0}
+          disabled={availableStock === 0 || isLoading}
         >
-          {availableStock === 0 ? "Out of Stock" : "Add to Cart"}
+          {isLoading
+            ? "Adding to Cart..."
+            : availableStock === 0
+              ? "Out of Stock"
+              : "Add to Cart"}
         </Button>
       </div>
     </div>

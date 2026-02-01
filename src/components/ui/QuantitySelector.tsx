@@ -7,6 +7,7 @@ interface QuantitySelectorProps {
   min?: number;
   max?: number;
   className?: string;
+  isLoading?: boolean;
 }
 
 export const QuantitySelector = memo(function QuantitySelector({
@@ -15,6 +16,7 @@ export const QuantitySelector = memo(function QuantitySelector({
   min = 1,
   max = 99,
   className = "",
+  isLoading = false,
 }: QuantitySelectorProps) {
   const handleDecrement = useCallback(() => {
     if (value > min) {
@@ -46,7 +48,7 @@ export const QuantitySelector = memo(function QuantitySelector({
         variant="ghost"
         size="sm"
         onClick={handleDecrement}
-        disabled={value <= min}
+        disabled={value <= min || isLoading}
         className="px-3 rounded-l-lg rounded-r-none"
       >
         −
@@ -57,13 +59,14 @@ export const QuantitySelector = memo(function QuantitySelector({
         onChange={handleInputChange}
         min={min}
         max={max}
-        className="w-16 text-center border-x border-gray-300 py-1 focus:outline-none"
+        disabled={isLoading}
+        className="w-16 text-center border-x border-gray-300 py-1 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
       />
       <Button
         variant="ghost"
         size="sm"
         onClick={handleIncrement}
-        disabled={value >= max}
+        disabled={value >= max || isLoading}
         className="px-3 rounded-r-lg rounded-l-none"
       >
         +
