@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { addToRecentlyViewed, getRecentlyViewed } from '@/lib/indexedDb';
+import { useState, useEffect } from "react";
+import { addToRecentlyViewed, getRecentlyViewed } from "@/lib/indexedDb";
 
 /**
  * Hook to track and retrieve recently viewed products
@@ -18,7 +18,7 @@ export function useRecentlyViewed() {
       const productIds = await getRecentlyViewed();
       setRecentlyViewed(productIds);
     } catch (error) {
-      console.error('Error loading recently viewed:', error);
+      console.error("Error loading recently viewed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -29,7 +29,7 @@ export function useRecentlyViewed() {
       await addToRecentlyViewed(productId);
       await loadRecentlyViewed();
     } catch (error) {
-      console.error('Error adding to recently viewed:', error);
+      console.error("Error adding to recently viewed:", error);
     }
   };
 

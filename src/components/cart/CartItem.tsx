@@ -31,7 +31,7 @@ export function CartItem({
   const price = calculateProductPrice(
     product,
     item.selectedVariants,
-    item.quantity
+    item.quantity,
   );
 
   const availableStock = getAvailableStock(product, item.selectedVariants);
@@ -39,13 +39,13 @@ export function CartItem({
 
   // Get variant details
   const colorVariant = product.variants.colors.find(
-    (c) => c.id === item.selectedVariants.color
+    (c) => c.id === item.selectedVariants.color,
   );
   const materialVariant = product.variants.materials.find(
-    (m) => m.id === item.selectedVariants.material
+    (m) => m.id === item.selectedVariants.material,
   );
   const sizeVariant = product.variants.sizes.find(
-    (s) => s.id === item.selectedVariants.size
+    (s) => s.id === item.selectedVariants.size,
   );
 
   return (
@@ -74,17 +74,17 @@ export function CartItem({
                 <span>•</span>
                 <span>Material: {materialVariant?.name}</span>
                 <span>•</span>
-                <span>Size: {sizeVariant?.label}</span>
+                <span>Size: {sizeVariant?.name}</span>
               </div>
             </div>
             <div className="text-right">
               <PriceDisplay
-                amount={price.total}
+                amount={price}
                 className="text-lg font-bold"
               />
               {item.quantity > 1 && (
                 <div className="text-sm text-gray-500">
-                  <PriceDisplay amount={price.total / item.quantity} /> each
+                  <PriceDisplay amount={price / item.quantity} /> each
                 </div>
               )}
             </div>

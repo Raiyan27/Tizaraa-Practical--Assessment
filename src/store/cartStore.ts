@@ -1,10 +1,10 @@
-import { create } from 'zustand';
-import { CartItem, SavedItem, Cart } from '@/types/cart';
-import { SelectedVariants } from '@/types/product';
-import { saveCart, loadCart, clearCart as clearCartDB } from '@/lib/indexedDb';
-import { getCartSyncChannel } from '@/lib/broadcastChannel';
-import { checkVariantStock } from '@/lib/validation';
-import { getProductById } from '@/data/products';
+import { create } from "zustand";
+import { CartItem, SavedItem, Cart } from "@/types/cart";
+import { SelectedVariants } from "@/types/product";
+import { saveCart, loadCart, clearCart as clearCartDB } from "@/lib/indexedDb";
+import { getCartSyncChannel } from "@/lib/broadcastChannel";
+import { checkVariantStock } from "@/lib/validation";
+import { getProductById } from "@/data/products";
 
 interface CartState {
   items: CartItem[];
@@ -12,22 +12,26 @@ interface CartState {
   promoCode?: string;
   isLoading: boolean;
   isInitialized: boolean;
-  
+
   // Actions
-  addItem: (productId: string, selectedVariants: SelectedVariants, quantity: number) => Promise<void>;
+  addItem: (
+    productId: string,
+    selectedVariants: SelectedVariants,
+    quantity: number,
+  ) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   removeItem: (itemId: string) => Promise<void>;
   clearCart: () => Promise<void>;
-  
+
   // Save for later
   saveForLater: (itemId: string) => Promise<void>;
   moveToCart: (savedItemId: string) => Promise<void>;
   removeSavedItem: (savedItemId: string) => Promise<void>;
-  
+
   // Promo code
   applyPromoCode: (code: string) => void;
   removePromoCode: () => void;
-  
+
   // Persistence
   loadCartFromStorage: () => Promise<void>;
   syncFromOtherTab: () => Promise<void>;
@@ -35,12 +39,12 @@ interface CartState {
 
 export const useCartStore = create<CartState>((set, get) => {
   // Set up cross-tab sync
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const syncChannel = getCartSyncChannel();
     syncChannel.subscribe((message) => {
-      if (message.type === 'CART_UPDATED') {
+      if (message.type === "CART_UPDATED") {
         get().syncFromOtherTab();
-      } else if (message.type === 'CART_CLEARED') {
+      } else if (message.type === "CART_CLEARED") {
         set({ items: [], savedItems: [], promoCode: undefined });
       }
     });
@@ -53,16 +57,20 @@ export const useCartStore = create<CartState>((set, get) => {
     isLoading: false,
     isInitialized: false,
 
-    addItem: async (productId: string, selectedVariants: SelectedVariants, quantity: number) => {
+    addItem: async (
+      productId: string,
+      selectedVariants: SelectedVariants,
+      quantity: number,
+    ) => {
       const product = getProductById(productId);
       if (!product) {
-        throw new Error('Product not found');
+        throw new Error("Product not found");
       }
 
       // Check stock availability
       const hasStock = checkVariantStock(product, selectedVariants, quantity);
       if (!hasStock) {
-        throw new Error('Insufficient stock for selected variants');
+        throw new Error("Insufficient stock for selected variants");
       }
 
       set({ isLoading: true });
@@ -76,7 +84,7 @@ export const useCartStore = create<CartState>((set, get) => {
             item.productId === productId &&
             item.selectedVariants.color === selectedVariants.color &&
             item.selectedVariants.material === selectedVariants.material &&
-            item.selectedVariants.size === selectedVariants.size
+            item.selectedVariants.size === selectedVariants.size,
         );
 
         let newItems: CartItem[];
@@ -85,12 +93,12 @@ export const useCartStore = create<CartState>((set, get) => {
           // Update quantity of existing item
           newItems = [...items];
           const newQuantity = newItems[existingItemIndex].quantity + quantity;
-          
+
           // Verify stock for new quantity
           if (!checkVariantStock(product, selectedVariants, newQuantity)) {
-            throw new Error('Insufficient stock for requested quantity');
+            throw new Error("Insufficient stock for requested quantity");
           }
-          
+
           newItems[existingItemIndex] = {
             ...newItems[existingItemIndex],
             quantity: newQuantity,
@@ -120,7 +128,7 @@ export const useCartStore = create<CartState>((set, get) => {
         // Broadcast to other tabs
         getCartSyncChannel().broadcastCartUpdate();
       } catch (error) {
-        console.error('Error adding item to cart:', error);
+        console.error("Error adding item to cart:", error);
         throw error;
       } finally {
         set({ isLoading: false });
@@ -139,19 +147,19 @@ export const useCartStore = create<CartState>((set, get) => {
         const itemIndex = items.findIndex((item) => item.id === itemId);
 
         if (itemIndex === -1) {
-          throw new Error('Item not found in cart');
+          throw new Error("Item not found in cart");
         }
 
         const item = items[itemIndex];
         const product = getProductById(item.productId);
 
         if (!product) {
-          throw new Error('Product not found');
+          throw new Error("Product not found");
         }
 
         // Check stock for new quantity
         if (!checkVariantStock(product, item.selectedVariants, quantity)) {
-          throw new Error('Insufficient stock for requested quantity');
+          throw new Error("Insufficient stock for requested quantity");
         }
 
         const newItems = [...items];
@@ -169,7 +177,7 @@ export const useCartStore = create<CartState>((set, get) => {
 
         getCartSyncChannel().broadcastCartUpdate();
       } catch (error) {
-        console.error('Error updating quantity:', error);
+        console.error("Error updating quantity:", error);
         throw error;
       } finally {
         set({ isLoading: false });
@@ -220,7 +228,7 @@ export const useCartStore = create<CartState>((set, get) => {
         const item = items.find((i) => i.id === itemId);
 
         if (!item) {
-          throw new Error('Item not found in cart');
+          throw new Error("Item not found in cart");
         }
 
         const savedItem: SavedItem = {
@@ -258,13 +266,20 @@ export const useCartStore = create<CartState>((set, get) => {
         const savedItem = savedItems.find((i) => i.id === savedItemId);
 
         if (!savedItem) {
-          throw new Error('Saved item not found');
+          throw new Error("Saved item not found");
         }
 
         // Check stock before moving to cart
         const product = getProductById(savedItem.productId);
-        if (!product || !checkVariantStock(product, savedItem.selectedVariants, savedItem.quantity)) {
-          throw new Error('Item is out of stock');
+        if (
+          !product ||
+          !checkVariantStock(
+            product,
+            savedItem.selectedVariants,
+            savedItem.quantity,
+          )
+        ) {
+          throw new Error("Item is out of stock");
         }
 
         const cartItem: CartItem = {
@@ -343,7 +358,7 @@ export const useCartStore = create<CartState>((set, get) => {
           set({ isInitialized: true });
         }
       } catch (error) {
-        console.error('Error loading cart from storage:', error);
+        console.error("Error loading cart from storage:", error);
         set({ isInitialized: true });
       } finally {
         set({ isLoading: false });
@@ -361,7 +376,7 @@ export const useCartStore = create<CartState>((set, get) => {
           });
         }
       } catch (error) {
-        console.error('Error syncing cart from other tab:', error);
+        console.error("Error syncing cart from other tab:", error);
       }
     },
   };

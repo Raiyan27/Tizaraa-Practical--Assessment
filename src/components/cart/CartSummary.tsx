@@ -36,7 +36,7 @@ export function CartSummary({
       setPromoError("");
     } catch (error) {
       setPromoError(
-        error instanceof Error ? error.message : "Invalid promo code"
+        error instanceof Error ? error.message : "Invalid promo code",
       );
     }
   };
@@ -55,21 +55,27 @@ export function CartSummary({
         {summary.quantityDiscount > 0 && (
           <div className="flex justify-between text-green-600">
             <span>Quantity Discount</span>
-            <span>-<PriceDisplay amount={summary.quantityDiscount} /></span>
+            <span>
+              -<PriceDisplay amount={summary.quantityDiscount} />
+            </span>
           </div>
         )}
 
         {summary.bundleDiscount > 0 && (
           <div className="flex justify-between text-green-600">
             <span>Bundle Discount</span>
-            <span>-<PriceDisplay amount={summary.bundleDiscount} /></span>
+            <span>
+              -<PriceDisplay amount={summary.bundleDiscount} />
+            </span>
           </div>
         )}
 
         {summary.promoDiscount > 0 && (
           <div className="flex justify-between text-green-600">
             <span>Promo Code</span>
-            <span>-<PriceDisplay amount={summary.promoDiscount} /></span>
+            <span>
+              -<PriceDisplay amount={summary.promoDiscount} />
+            </span>
           </div>
         )}
 
@@ -125,9 +131,7 @@ export function CartSummary({
                 Apply
               </Button>
             </div>
-            {promoError && (
-              <p className="text-sm text-red-600">{promoError}</p>
-            )}
+            {promoError && <p className="text-sm text-red-600">{promoError}</p>}
           </div>
         )}
       </div>

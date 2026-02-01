@@ -24,32 +24,32 @@ export function SavedItem({ item, onMoveToCart, onRemove }: SavedItemProps) {
   const price = calculateProductPrice(
     product,
     item.selectedVariants,
-    item.quantity
+    item.quantity,
   );
 
   const availableStock = getAvailableStock(product, item.selectedVariants);
   const hasStock = checkVariantStock(
     product,
     item.selectedVariants,
-    item.quantity
+    item.quantity,
   );
 
   // Get variant details
   const colorVariant = product.variants.colors.find(
-    (c) => c.id === item.selectedVariants.color
+    (c) => c.id === item.selectedVariants.color,
   );
   const materialVariant = product.variants.materials.find(
-    (m) => m.id === item.selectedVariants.material
+    (m) => m.id === item.selectedVariants.material,
   );
   const sizeVariant = product.variants.sizes.find(
-    (s) => s.id === item.selectedVariants.size
+    (s) => s.id === item.selectedVariants.size,
   );
 
   return (
     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
       <div className="flex gap-4">
         {/* Product Image Placeholder */}
-        <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center shrink-0">
           <div
             className="w-12 h-12 rounded"
             style={{ backgroundColor: colorVariant?.hex }}
@@ -71,10 +71,10 @@ export function SavedItem({ item, onMoveToCart, onRemove }: SavedItemProps) {
                 <span>•</span>
                 <span>Material: {materialVariant?.name}</span>
                 <span>•</span>
-                <span>Size: {sizeVariant?.label}</span>
+                <span>Size: {sizeVariant?.name}</span>
               </div>
             </div>
-            <PriceDisplay amount={price.total} className="font-bold" />
+            <PriceDisplay amount={price} className="font-bold" />
           </div>
 
           {/* Stock Status */}

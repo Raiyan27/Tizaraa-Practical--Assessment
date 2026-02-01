@@ -158,7 +158,7 @@ export function calculateCartSummary(
   productGetter: (id: string) => Product | undefined = getProductById,
 ): PriceBreakdown {
   // Get promo code object if string provided
-  const { getPromoCodeByCode } = require('@/data/promo-codes');
+  const { getPromoCodeByCode } = require("@/data/promo-codes");
   const promoCode: PromoCode | undefined = promoCodeStr
     ? getPromoCodeByCode(promoCodeStr)
     : undefined;
