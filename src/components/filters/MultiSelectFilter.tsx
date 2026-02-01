@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo, useCallback } from "react";
 import { FilterOption } from "@/types/filters";
 
 interface MultiSelectFilterProps {
@@ -12,7 +12,7 @@ interface MultiSelectFilterProps {
   maxVisible?: number;
 }
 
-export function MultiSelectFilter({
+export const MultiSelectFilter = memo(function MultiSelectFilter({
   options,
   selectedIds,
   onToggle,
@@ -20,6 +20,7 @@ export function MultiSelectFilter({
   maxVisible = 5,
 }: MultiSelectFilterProps) {
   const [showAll, setShowAll] = useState(false);
+  const toggleShowAll = useCallback(() => setShowAll((prev) => !prev), []);
 
   const visibleOptions = showAll ? options : options.slice(0, maxVisible);
   const hasMore = options.length > maxVisible;
@@ -95,7 +96,7 @@ export function MultiSelectFilter({
       {/* Show More / Less button */}
       {hasMore && (
         <button
-          onClick={() => setShowAll(!showAll)}
+          onClick={toggleShowAll}
           className="w-full text-sm text-blue-600 hover:text-blue-700 py-2 font-medium"
         >
           {showAll ? "Show Less" : `Show ${options.length - maxVisible} More`}
@@ -103,4 +104,4 @@ export function MultiSelectFilter({
       )}
     </div>
   );
-}
+});

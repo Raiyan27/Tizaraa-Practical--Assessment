@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useCallback } from "react";
 import { FilterState, FilterCounts } from "@/types/filters";
 import { FilterPanel } from "./FilterPanel";
 
@@ -20,7 +20,7 @@ interface MobileFilterDrawerProps {
   activeFilterCount: number;
 }
 
-export function MobileFilterDrawer({
+export const MobileFilterDrawer = memo(function MobileFilterDrawer({
   isOpen,
   onClose,
   filters,
@@ -99,4 +99,4 @@ export function MobileFilterDrawer({
       </div>
     </>
   );
-}
+});

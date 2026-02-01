@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback } from "react";
 import { SavedItem as SavedItemType } from "@/types/cart";
 import { CartItem as CartItemType } from "@/types/cart";
 import { getProductById } from "@/data/products";
@@ -17,7 +18,7 @@ interface SavedItemProps {
   onRemove: () => void;
 }
 
-export function SavedItem({
+export const SavedItem = memo(function SavedItem({
   item,
   cartItems = [],
   onMoveToCart,
@@ -53,6 +54,14 @@ export function SavedItem({
   const sizeVariant = product.variants.sizes.find(
     (s) => s.id === item.selectedVariants.size,
   );
+
+  const handleMoveToCart = useCallback(() => {
+    onMoveToCart();
+  }, [onMoveToCart]);
+
+  const handleRemove = useCallback(() => {
+    onRemove();
+  }, [onRemove]);
 
   return (
     <div className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col">
@@ -113,7 +122,7 @@ export function SavedItem({
       {/* Fixed Action Bar at Bottom */}
       <div className="px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-300 bg-gray-100 flex gap-2 sm:gap-3 text-xs sm:text-sm flex-shrink-0 whitespace-nowrap">
         <button
-          onClick={onMoveToCart}
+          onClick={handleMoveToCart}
           disabled={!hasStock}
           className="text-blue-600 hover:text-blue-700 font-medium disabled:text-gray-400 disabled:cursor-not-allowed active:text-blue-800"
         >
@@ -121,7 +130,7 @@ export function SavedItem({
         </button>
         <span className="text-gray-300">|</span>
         <button
-          onClick={onRemove}
+          onClick={handleRemove}
           className="text-red-600 hover:text-red-700 font-medium active:text-red-800"
         >
           Remove
@@ -129,4 +138,4 @@ export function SavedItem({
       </div>
     </div>
   );
-}
+});

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { calculateCartSummary } from "@/lib/pricing";
@@ -33,34 +33,81 @@ export default function CartPage() {
     loadCartFromStorage();
   }, [loadCartFromStorage]);
 
-  const handleApplyPromo = (code: string) => {
-    const promo = getPromoCodeByCode(code);
-    if (!promo) {
-      throw new Error("Invalid promo code");
-    }
-    applyPromoCode(code);
-  };
+  const handleApplyPromo = useCallback(
+    (code: string) => {
+      const promo = getPromoCodeByCode(code);
+      if (!promo) {
+        throw new Error("Invalid promo code");
+      }
+      applyPromoCode(code);
+    },
+    [applyPromoCode],
+  );
 
-  const handleCheckout = () => {
+  const handleCheckout = useCallback(() => {
     alert("Checkout functionality coming soon!");
-  };
+  }, []);
 
-  // Calculate cart summary with multiple promo codes
-  const summary = calculateCartSummary(items, promoCodes);
+  // Memoize cart summary calculation to prevent unnecessary recalculations
+  const summary = useMemo(
+    () => calculateCartSummary(items, promoCodes),
+    [items, promoCodes],
+  );
 
-  if (!isInitialized || isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading cart...</p>
-        </div>
-      </div>
-    );
-  }
+  // Memoize derived state
+  const isEmpty = useMemo(
+    () => items.length === 0 && savedItems.length === 0,
+    [items.length, savedItems.length],
+  );
 
-  const isEmpty = items.length === 0 && savedItems.length === 0;
-  const hasCartItems = items.length > 0;
+  const hasCartItems = useMemo(() => items.length > 0, [items.length]);
+
+  // Memoize cart item handlers
+  const handleUpdateQuantity = useCallback(
+    (itemId: string, quantity: number) => {
+      updateQuantity(itemId, quantity);
+    },
+    [updateQuantity],
+  );
+
+  const handleRemoveItem = useCallback(
+    (itemId: string) => {
+      removeItem(itemId);
+    },
+    [removeItem],
+  );
+
+  const handleSaveForLater = useCallback(
+    (itemId: string) => {
+      saveForLater(itemId);
+    },
+    [saveForLater],
+  );
+
+  const handleMoveToCart = useCallback(
+    (savedItemId: string) => {
+      moveToCart(savedItemId);
+    },
+    [moveToCart],
+  );
+
+  const handleRemoveSavedItem = useCallback(
+    (savedItemId: string) => {
+      removeSavedItem(savedItemId);
+    },
+    [removeSavedItem],
+  );
+
+  const handleRemovePromo = useCallback(
+    (code: string) => {
+      removePromoCode(code);
+    },
+    [removePromoCode],
+  );
+
+  const handleContinueShopping = useCallback(() => {
+    router.push("/");
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -81,7 +128,7 @@ export default function CartPage() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => router.push("/")}
+            onClick={handleContinueShopping}
           >
             Continue Shopping
           </Button>
@@ -115,7 +162,7 @@ export default function CartPage() {
               <Button
                 variant="primary"
                 size="lg"
-                onClick={() => router.push("/")}
+                onClick={handleContinueShopping}
               >
                 Start Shopping
               </Button>
@@ -133,10 +180,10 @@ export default function CartPage() {
                       key={item.id}
                       item={item}
                       onUpdateQuantity={(quantity) =>
-                        updateQuantity(item.id, quantity)
+                        handleUpdateQuantity(item.id, quantity)
                       }
-                      onRemove={() => removeItem(item.id)}
-                      onSaveForLater={() => saveForLater(item.id)}
+                      onRemove={() => handleRemoveItem(item.id)}
+                      onSaveForLater={() => handleSaveForLater(item.id)}
                     />
                   ))}
                 </>
@@ -154,8 +201,8 @@ export default function CartPage() {
                         key={item.id}
                         item={item}
                         cartItems={items}
-                        onMoveToCart={() => moveToCart(item.id)}
-                        onRemove={() => removeSavedItem(item.id)}
+                        onMoveToCart={() => handleMoveToCart(item.id)}
+                        onRemove={() => handleRemoveSavedItem(item.id)}
                       />
                     ))}
                   </div>
@@ -170,7 +217,7 @@ export default function CartPage() {
                   summary={summary}
                   promoCodes={promoCodes}
                   onApplyPromo={handleApplyPromo}
-                  onRemovePromo={removePromoCode}
+                  onRemovePromo={handleRemovePromo}
                   onCheckout={handleCheckout}
                 />
               </div>

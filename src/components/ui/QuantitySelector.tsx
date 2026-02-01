@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { Button } from "./Button";
 
 interface QuantitySelectorProps {
@@ -9,31 +9,34 @@ interface QuantitySelectorProps {
   className?: string;
 }
 
-export function QuantitySelector({
+export const QuantitySelector = memo(function QuantitySelector({
   value,
   onChange,
   min = 1,
   max = 99,
   className = "",
 }: QuantitySelectorProps) {
-  const handleDecrement = () => {
+  const handleDecrement = useCallback(() => {
     if (value > min) {
       onChange(value - 1);
     }
-  };
+  }, [value, min, onChange]);
 
-  const handleIncrement = () => {
+  const handleIncrement = useCallback(() => {
     if (value < max) {
       onChange(value + 1);
     }
-  };
+  }, [value, max, onChange]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = parseInt(e.target.value, 10);
-    if (!isNaN(newValue) && newValue >= min && newValue <= max) {
-      onChange(newValue);
-    }
-  };
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = parseInt(e.target.value, 10);
+      if (!isNaN(newValue) && newValue >= min && newValue <= max) {
+        onChange(newValue);
+      }
+    },
+    [min, max, onChange],
+  );
 
   return (
     <div
@@ -67,4 +70,4 @@ export function QuantitySelector({
       </Button>
     </div>
   );
-}
+});

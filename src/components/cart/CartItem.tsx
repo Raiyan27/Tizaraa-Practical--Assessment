@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback } from "react";
 import { CartItem as CartItemType } from "@/types/cart";
 import { getProductById } from "@/data/products";
 import { calculateProductPrice } from "@/lib/pricing";
@@ -17,7 +18,7 @@ interface CartItemProps {
   onSaveForLater: () => void;
 }
 
-export function CartItem({
+export const CartItem = memo(function CartItem({
   item,
   onUpdateQuantity,
   onRemove,
@@ -48,6 +49,21 @@ export function CartItem({
   const sizeVariant = product.variants.sizes.find(
     (s) => s.id === item.selectedVariants.size,
   );
+
+  const handleQuantityChange = useCallback(
+    (quantity: number) => {
+      onUpdateQuantity(quantity);
+    },
+    [onUpdateQuantity],
+  );
+
+  const handleRemove = useCallback(() => {
+    onRemove();
+  }, [onRemove]);
+
+  const handleSaveForLater = useCallback(() => {
+    onSaveForLater();
+  }, [onSaveForLater]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col">
@@ -103,21 +119,21 @@ export function CartItem({
       <div className="px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-2 sm:gap-3 flex-shrink-0">
         <QuantitySelector
           value={item.quantity}
-          onChange={onUpdateQuantity}
+          onChange={handleQuantityChange}
           min={1}
           max={availableStock}
         />
 
         <div className="flex gap-2 sm:gap-3 text-xs sm:text-sm shrink-0 whitespace-nowrap">
           <button
-            onClick={onSaveForLater}
+            onClick={handleSaveForLater}
             className="text-blue-600 hover:text-blue-700 font-medium active:text-blue-800"
           >
             Save for later
           </button>
           <span className="text-gray-300">|</span>
           <button
-            onClick={onRemove}
+            onClick={handleRemove}
             className="text-red-600 hover:text-red-700 font-medium active:text-red-800"
           >
             Remove
@@ -126,4 +142,4 @@ export function CartItem({
       </div>
     </div>
   );
-}
+});

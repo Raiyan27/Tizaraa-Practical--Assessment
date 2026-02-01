@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback } from "react";
 import { SortOption } from "@/types/filters";
 
 interface SortSelectProps {
@@ -15,7 +16,17 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: "newest", label: "Newest First" },
 ];
 
-export function SortSelect({ value, onChange }: SortSelectProps) {
+export const SortSelect = memo(function SortSelect({
+  value,
+  onChange,
+}: SortSelectProps) {
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      onChange(e.target.value as SortOption);
+    },
+    [onChange],
+  );
+
   return (
     <div className="flex items-center gap-2">
       <label htmlFor="sort" className="text-sm text-gray-600 whitespace-nowrap">
@@ -24,7 +35,7 @@ export function SortSelect({ value, onChange }: SortSelectProps) {
       <select
         id="sort"
         value={value}
-        onChange={(e) => onChange(e.target.value as SortOption)}
+        onChange={handleChange}
         className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer max-w-36"
       >
         {sortOptions.map((option) => (
@@ -35,4 +46,4 @@ export function SortSelect({ value, onChange }: SortSelectProps) {
       </select>
     </div>
   );
-}
+});

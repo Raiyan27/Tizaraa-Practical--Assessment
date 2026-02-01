@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo, useCallback } from "react";
 import { PriceBreakdown } from "@/lib/pricing";
 import { PriceDisplay } from "@/components/ui/PriceDisplay";
 import { Input } from "@/components/ui/Input";
@@ -15,7 +15,7 @@ interface CartSummaryProps {
   onCheckout: () => void;
 }
 
-export function CartSummary({
+export const CartSummary = memo(function CartSummary({
   summary,
   promoCodes = [],
   onApplyPromo,
@@ -25,7 +25,7 @@ export function CartSummary({
   const [promoInput, setPromoInput] = useState("");
   const [promoError, setPromoError] = useState("");
 
-  const handleApplyPromo = () => {
+  const handleApplyPromo = useCallback(() => {
     if (!promoInput.trim()) {
       setPromoError("Please enter a promo code");
       return;
@@ -46,7 +46,35 @@ export function CartSummary({
         error instanceof Error ? error.message : "Invalid promo code",
       );
     }
-  };
+  }, [promoInput, promoCodes, onApplyPromo]);
+
+  const handlePromoInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPromoInput(e.target.value);
+      setPromoError("");
+    },
+    [],
+  );
+
+  const handlePromoKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        handleApplyPromo();
+      }
+    },
+    [handleApplyPromo],
+  );
+
+  const handleRemovePromo = useCallback(
+    (code: string) => {
+      onRemovePromo(code);
+    },
+    [onRemovePromo],
+  );
+
+  const handleCheckout = useCallback(() => {
+    onCheckout();
+  }, [onCheckout]);
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:sticky lg:top-4">
@@ -126,7 +154,7 @@ export function CartSummary({
                   <Badge variant="success">{code}</Badge>
                 </div>
                 <button
-                  onClick={() => onRemovePromo(code)}
+                  onClick={() => handleRemovePromo(code)}
                   className="text-xs sm:text-sm text-red-600 hover:text-red-700"
                 >
                   Remove
@@ -141,15 +169,8 @@ export function CartSummary({
           <div className="flex flex-col sm:flex-row gap-2">
             <Input
               value={promoInput}
-              onChange={(e) => {
-                setPromoInput(e.target.value);
-                setPromoError("");
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleApplyPromo();
-                }
-              }}
+              onChange={handlePromoInputChange}
+              onKeyDown={handlePromoKeyDown}
               placeholder="Enter promo code"
               className="flex-1 text-sm"
             />
@@ -164,7 +185,11 @@ export function CartSummary({
       </div>
 
       {/* Checkout Button */}
-      <Button onClick={onCheckout} variant="primary" className="w-full mb-3">
+      <Button
+        onClick={handleCheckout}
+        variant="primary"
+        className="w-full mb-3"
+      >
         Proceed to Checkout
       </Button>
 
@@ -182,4 +207,4 @@ export function CartSummary({
       )}
     </div>
   );
-}
+});

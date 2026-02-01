@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo, useCallback } from "react";
 
 interface SearchBarProps {
   value: string;
@@ -9,7 +9,7 @@ interface SearchBarProps {
   debounceMs?: number;
 }
 
-export function SearchBar({
+export const SearchBar = memo(function SearchBar({
   value,
   onChange,
   placeholder = "Search products...",
@@ -34,11 +34,11 @@ export function SearchBar({
     return () => clearTimeout(timer);
   }, [localValue, value, onChange, debounceMs]);
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setLocalValue("");
     onChange("");
     inputRef.current?.focus();
-  };
+  }, [onChange]);
 
   return (
     <div className="relative">
@@ -92,4 +92,4 @@ export function SearchBar({
       )}
     </div>
   );
-}
+});

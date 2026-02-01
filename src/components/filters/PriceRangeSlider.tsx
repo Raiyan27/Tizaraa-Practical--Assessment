@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, memo } from "react";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 
@@ -12,7 +12,7 @@ interface PriceRangeSliderProps {
   formatPrice?: (price: number) => string;
 }
 
-export function PriceRangeSlider({
+export const PriceRangeSlider = memo(function PriceRangeSlider({
   min,
   max,
   value,
@@ -40,29 +40,35 @@ export function PriceRangeSlider({
     [onChange],
   );
 
-  const handleMinInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMin = Math.max(
-      min,
-      Math.min(Number(e.target.value), localValue[1] - 1),
-    );
-    setLocalValue([newMin, localValue[1]]);
-  };
+  const handleMinInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newMin = Math.max(
+        min,
+        Math.min(Number(e.target.value), localValue[1] - 1),
+      );
+      setLocalValue([newMin, localValue[1]]);
+    },
+    [min, localValue],
+  );
 
-  const handleMaxInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMax = Math.min(
-      max,
-      Math.max(Number(e.target.value), localValue[0] + 1),
-    );
-    setLocalValue([localValue[0], newMax]);
-  };
+  const handleMaxInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newMax = Math.min(
+        max,
+        Math.max(Number(e.target.value), localValue[0] + 1),
+      );
+      setLocalValue([localValue[0], newMax]);
+    },
+    [max, localValue],
+  );
 
-  const handleMinInputBlur = () => {
+  const handleMinInputBlur = useCallback(() => {
     onChange({ min: localValue[0], max: localValue[1] });
-  };
+  }, [onChange, localValue]);
 
-  const handleMaxInputBlur = () => {
+  const handleMaxInputBlur = useCallback(() => {
     onChange({ min: localValue[0], max: localValue[1] });
-  };
+  }, [onChange, localValue]);
 
   return (
     <div className="px-1">
@@ -141,4 +147,4 @@ export function PriceRangeSlider({
       </div>
     </div>
   );
-}
+});

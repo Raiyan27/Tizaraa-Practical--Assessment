@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useRef, useEffect } from "react";
+import { Suspense, useRef, useEffect, memo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Environment } from "@react-three/drei";
 import { Product, SelectedVariants } from "@/types/product";
@@ -32,7 +32,7 @@ interface StaticProductPreviewProps {
   size?: number;
 }
 
-export function StaticProductPreview({
+export const StaticProductPreview = memo(function StaticProductPreview({
   product,
   selectedVariants,
   size = 96,
@@ -136,4 +136,4 @@ export function StaticProductPreview({
       </Canvas>
     </div>
   );
-}
+});

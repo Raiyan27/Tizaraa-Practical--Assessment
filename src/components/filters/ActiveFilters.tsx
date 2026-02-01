@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback } from "react";
 import { FilterState } from "@/types/filters";
 
 interface ActiveFiltersProps {
@@ -24,7 +25,11 @@ interface FilterTagProps {
   color?: string;
 }
 
-function FilterTag({ label, onRemove, color }: FilterTagProps) {
+const FilterTag = memo(function FilterTag({
+  label,
+  onRemove,
+  color,
+}: FilterTagProps) {
   return (
     <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-sm rounded-full">
       {color && (
@@ -54,9 +59,9 @@ function FilterTag({ label, onRemove, color }: FilterTagProps) {
       </button>
     </span>
   );
-}
+});
 
-export function ActiveFilters({
+export const ActiveFilters = memo(function ActiveFilters({
   filters,
   filterCounts,
   onRemoveColor,
@@ -80,14 +85,23 @@ export function ActiveFilters({
 
   if (!hasActiveFilters) return null;
 
-  const getColorName = (id: string) =>
-    filterCounts.colors.find((c) => c.id === id)?.name || id;
-  const getColorHex = (id: string) => {
-    const color = filterCounts.colors.find((c) => c.id === id);
-    return (color as { hex?: string })?.hex;
-  };
-  const getSizeName = (id: string) =>
-    filterCounts.sizes.find((s) => s.id === id)?.name || id;
+  const getColorName = useCallback(
+    (id: string) => filterCounts.colors.find((c) => c.id === id)?.name || id,
+    [filterCounts.colors],
+  );
+
+  const getColorHex = useCallback(
+    (id: string) => {
+      const color = filterCounts.colors.find((c) => c.id === id);
+      return (color as { hex?: string })?.hex;
+    },
+    [filterCounts.colors],
+  );
+
+  const getSizeName = useCallback(
+    (id: string) => filterCounts.sizes.find((s) => s.id === id)?.name || id,
+    [filterCounts.sizes],
+  );
 
   const isPriceFiltered =
     filters.priceRange.min > 0 || filters.priceRange.max < 1000;
@@ -167,4 +181,4 @@ export function ActiveFilters({
       </button>
     </div>
   );
-}
+});

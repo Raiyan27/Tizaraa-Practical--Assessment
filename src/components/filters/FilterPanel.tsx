@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import { FilterCounts, FilterState } from "@/types/filters";
 import { PriceRangeSlider } from "./PriceRangeSlider";
 import { RatingFilter } from "./RatingFilter";
@@ -28,7 +28,7 @@ interface FilterSectionProps {
   badge?: number;
 }
 
-function FilterSection({
+const FilterSection = memo(function FilterSection({
   title,
   isOpen,
   onToggle,
@@ -68,9 +68,9 @@ function FilterSection({
       {isOpen && <div className="pb-4 px-1">{children}</div>}
     </div>
   );
-}
+});
 
-export function FilterPanel({
+export const FilterPanel = memo(function FilterPanel({
   filters,
   filterCounts,
   onPriceChange,
@@ -93,9 +93,9 @@ export function FilterPanel({
     origin: false,
   });
 
-  const toggleSection = (section: string) => {
+  const toggleSection = useCallback((section: string) => {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
-  };
+  }, []);
 
   const isPriceFiltered =
     filters.priceRange.min !== filterCounts.priceRange.min ||
@@ -265,4 +265,4 @@ export function FilterPanel({
       </div>
     </div>
   );
-}
+});
