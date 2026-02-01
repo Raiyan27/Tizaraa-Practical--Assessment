@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useRef } from 'react';
-import { Mesh } from 'three';
-import { useFrame } from '@react-three/fiber';
+import { useRef } from "react";
+import { Mesh } from "three";
+import { useFrame } from "@react-three/fiber";
 
 interface RingModelProps {
   color: string;
@@ -10,7 +10,11 @@ interface RingModelProps {
   metalness?: number;
 }
 
-export function RingModel({ color, roughness = 0.2, metalness = 0.8 }: RingModelProps) {
+export function RingModel({
+  color,
+  roughness = 0.2,
+  metalness = 0.8,
+}: RingModelProps) {
   const ringRef = useRef<Mesh>(null);
 
   useFrame((state) => {
@@ -23,7 +27,11 @@ export function RingModel({ color, roughness = 0.2, metalness = 0.8 }: RingModel
   return (
     <mesh ref={ringRef} castShadow>
       <torusGeometry args={[1, 0.3, 16, 32]} />
-      <meshStandardMaterial color={color} roughness={roughness} metalness={metalness} />
+      <meshStandardMaterial
+        color={color}
+        roughness={roughness}
+        metalness={metalness}
+      />
     </mesh>
   );
 }

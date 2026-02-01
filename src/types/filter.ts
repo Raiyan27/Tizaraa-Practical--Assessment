@@ -1,4 +1,9 @@
-export type SortOption = 'price-low' | 'price-high' | 'newest' | 'rating' | 'popular';
+export type SortOption =
+  | "price-low"
+  | "price-high"
+  | "newest"
+  | "rating"
+  | "popular";
 
 export interface FilterState {
   search: string;

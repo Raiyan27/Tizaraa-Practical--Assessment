@@ -1,4 +1,4 @@
-import { SelectedVariants } from './product';
+import { SelectedVariants } from "./product";
 
 export interface CartItem {
   id: string; // Unique cart item ID
@@ -9,7 +9,7 @@ export interface CartItem {
   addedAt: string; // ISO timestamp
 }
 
-export interface SavedItem extends Omit<CartItem, 'id'> {
+export interface SavedItem extends Omit<CartItem, "id"> {
   id: string;
   savedAt: string; // ISO timestamp
 }

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from './Button';
+import React from "react";
+import { Button } from "./Button";
 
 interface QuantitySelectorProps {
   value: number;
@@ -9,12 +9,12 @@ interface QuantitySelectorProps {
   className?: string;
 }
 
-export function QuantitySelector({ 
-  value, 
-  onChange, 
-  min = 1, 
+export function QuantitySelector({
+  value,
+  onChange,
+  min = 1,
   max = 99,
-  className = '' 
+  className = "",
 }: QuantitySelectorProps) {
   const handleDecrement = () => {
     if (value > min) {
@@ -36,7 +36,9 @@ export function QuantitySelector({
   };
 
   return (
-    <div className={`inline-flex items-center border border-gray-300 rounded-lg ${className}`}>
+    <div
+      className={`inline-flex items-center border border-gray-300 rounded-lg ${className}`}
+    >
       <Button
         variant="ghost"
         size="sm"

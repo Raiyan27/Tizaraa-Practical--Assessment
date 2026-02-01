@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Button } from './ui/Button';
+import React from "react";
+import { Button } from "./ui/Button";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -13,7 +13,10 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -24,7 +27,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
   }
 
   handleReset = () => {
@@ -45,15 +48,13 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               Something went wrong
             </h1>
             <p className="text-gray-600 mb-6">
-              {this.state.error?.message || 'An unexpected error occurred'}
+              {this.state.error?.message || "An unexpected error occurred"}
             </p>
             <div className="space-x-4">
-              <Button onClick={this.handleReset}>
-                Try Again
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => window.location.href = '/'}
+              <Button onClick={this.handleReset}>Try Again</Button>
+              <Button
+                variant="outline"
+                onClick={() => (window.location.href = "/")}
               >
                 Go Home
               </Button>

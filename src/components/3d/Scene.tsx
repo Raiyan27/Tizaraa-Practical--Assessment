@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows } from '@react-three/drei';
-import { Suspense } from 'react';
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
+import { Suspense } from "react";
 
 interface SceneProps {
   children: React.ReactNode;

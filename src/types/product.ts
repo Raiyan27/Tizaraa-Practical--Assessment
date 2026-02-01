@@ -27,7 +27,7 @@ export interface Product {
   brand?: string;
   origin?: string;
   createdAt?: string;
-  geometryType?: 'box' | 'cylinder' | 'sphere' | 'torus' | 'lathe' | 'combined';
+  geometryType?: "box" | "cylinder" | "sphere" | "torus" | "lathe" | "combined";
 }
 
 export interface SelectedVariants {

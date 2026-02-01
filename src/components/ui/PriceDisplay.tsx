@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface PriceDisplayProps {
   amount: number;
@@ -7,22 +7,18 @@ interface PriceDisplayProps {
   showCents?: boolean;
 }
 
-export function PriceDisplay({ 
-  amount, 
-  currency = 'USD', 
-  className = '',
-  showCents = true 
+export function PriceDisplay({
+  amount,
+  currency = "USD",
+  className = "",
+  showCents = true,
 }: PriceDisplayProps) {
-  const formatted = new Intl.NumberFormat('en-US', {
-    style: 'currency',
+  const formatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
     currency,
     minimumFractionDigits: showCents ? 2 : 0,
     maximumFractionDigits: showCents ? 2 : 0,
   }).format(amount);
 
-  return (
-    <span className={`font-semibold ${className}`}>
-      {formatted}
-    </span>
-  );
+  return <span className={`font-semibold ${className}`}>{formatted}</span>;
 }

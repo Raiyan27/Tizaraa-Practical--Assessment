@@ -1,7 +1,7 @@
-import { Product, SelectedVariants } from '@/types/product';
-import { CartItem } from '@/types/cart';
-import { PromoCode } from '@/types/promo';
-import { getVariantById, getProductById } from '@/data/products';
+import { Product, SelectedVariants } from "@/types/product";
+import { CartItem } from "@/types/cart";
+import { PromoCode } from "@/types/promo";
+import { getVariantById, getProductById } from "@/data/products";
 
 export interface PriceBreakdown {
   basePrice: number;
@@ -21,14 +21,22 @@ export interface PriceBreakdown {
 export function calculateProductPrice(
   product: Product,
   selectedVariants: SelectedVariants,
-  quantity: number = 1
+  quantity: number = 1,
 ): number {
   const basePrice = product.basePrice;
 
   // Get variant modifiers
-  const colorVariant = getVariantById(product, 'colors', selectedVariants.color);
-  const materialVariant = getVariantById(product, 'materials', selectedVariants.material);
-  const sizeVariant = getVariantById(product, 'sizes', selectedVariants.size);
+  const colorVariant = getVariantById(
+    product,
+    "colors",
+    selectedVariants.color,
+  );
+  const materialVariant = getVariantById(
+    product,
+    "materials",
+    selectedVariants.material,
+  );
+  const sizeVariant = getVariantById(product, "sizes", selectedVariants.size);
 
   const variantModifiers =
     (colorVariant?.priceModifier || 0) +
@@ -52,17 +60,17 @@ export function calculateBundleDiscount(items: CartItem[]): number {
 
   // Group items by product
   const productGroups = new Map<string, CartItem[]>();
-  items.forEach(item => {
+  items.forEach((item) => {
     const existing = productGroups.get(item.productId) || [];
     productGroups.set(item.productId, [...existing, item]);
   });
 
   // Check if any products are bundle eligible
   const bundleEligibleProducts = new Set<string>();
-  items.forEach(item => {
+  items.forEach((item) => {
     const product = getProductById(item.productId);
     if (product?.bundleEligible) {
-      product.bundleEligible.forEach(id => bundleEligibleProducts.add(id));
+      product.bundleEligible.forEach((id) => bundleEligibleProducts.add(id));
       bundleEligibleProducts.add(product.id);
     }
   });
@@ -71,12 +79,16 @@ export function calculateBundleDiscount(items: CartItem[]): number {
   let bundleItemCount = 0;
   let bundleSubtotal = 0;
 
-  items.forEach(item => {
+  items.forEach((item) => {
     if (bundleEligibleProducts.has(item.productId)) {
       bundleItemCount += item.quantity;
       const product = getProductById(item.productId);
       if (product) {
-        const price = calculateProductPrice(product, item.selectedVariants, item.quantity);
+        const price = calculateProductPrice(
+          product,
+          item.selectedVariants,
+          item.quantity,
+        );
         bundleSubtotal += price;
       }
     }
@@ -95,15 +107,15 @@ export function calculateBundleDiscount(items: CartItem[]): number {
  */
 export function calculatePromoDiscount(
   subtotal: number,
-  promoCode?: PromoCode
+  promoCode?: PromoCode,
 ): number {
   if (!promoCode) return 0;
 
-  if (promoCode.discountType === 'percentage') {
+  if (promoCode.discountType === "percentage") {
     return subtotal * (promoCode.discountValue / 100);
   }
 
-  if (promoCode.discountType === 'fixed') {
+  if (promoCode.discountType === "fixed") {
     return Math.min(promoCode.discountValue, subtotal);
   }
 
@@ -120,12 +132,15 @@ export function calculateTax(subtotal: number): number {
 /**
  * Calculate shipping ($10 flat rate, free over $75 after discounts)
  */
-export function calculateShipping(subtotal: number, promoCode?: PromoCode): number {
+export function calculateShipping(
+  subtotal: number,
+  promoCode?: PromoCode,
+): number {
   const SHIPPING_COST = 10;
   const FREE_SHIPPING_THRESHOLD = 75;
 
   // Check if promo code provides free shipping
-  if (promoCode?.code === 'FREESHIP' && subtotal >= FREE_SHIPPING_THRESHOLD) {
+  if (promoCode?.code === "FREESHIP" && subtotal >= FREE_SHIPPING_THRESHOLD) {
     return 0;
   }
 
@@ -139,21 +154,33 @@ export function calculateShipping(subtotal: number, promoCode?: PromoCode): numb
 export function calculateCartSummary(
   items: CartItem[],
   promoCode?: PromoCode,
-  productGetter: (id: string) => Product | undefined = getProductById
+  productGetter: (id: string) => Product | undefined = getProductById,
 ): PriceBreakdown {
   // Calculate base price for all items
   let basePrice = 0;
   let variantModifiers = 0;
 
-  items.forEach(item => {
+  items.forEach((item) => {
     const product = productGetter(item.productId);
     if (!product) return;
 
     basePrice += product.basePrice * item.quantity;
 
-    const colorVariant = getVariantById(product, 'colors', item.selectedVariants.color);
-    const materialVariant = getVariantById(product, 'materials', item.selectedVariants.material);
-    const sizeVariant = getVariantById(product, 'sizes', item.selectedVariants.size);
+    const colorVariant = getVariantById(
+      product,
+      "colors",
+      item.selectedVariants.color,
+    );
+    const materialVariant = getVariantById(
+      product,
+      "materials",
+      item.selectedVariants.material,
+    );
+    const sizeVariant = getVariantById(
+      product,
+      "sizes",
+      item.selectedVariants.size,
+    );
 
     variantModifiers +=
       ((colorVariant?.priceModifier || 0) +
@@ -166,26 +193,37 @@ export function calculateCartSummary(
 
   // Calculate quantity discount for each item
   let quantityDiscount = 0;
-  items.forEach(item => {
+  items.forEach((item) => {
     const product = productGetter(item.productId);
     if (!product) return;
 
     if (item.quantity >= 5) {
-      const itemPrice = calculateProductPrice(product, item.selectedVariants, item.quantity);
-      const itemSubtotal = calculateProductPrice(product, item.selectedVariants, item.quantity) / 0.9; // Reverse the discount
+      const itemPrice = calculateProductPrice(
+        product,
+        item.selectedVariants,
+        item.quantity,
+      );
+      const itemSubtotal =
+        calculateProductPrice(product, item.selectedVariants, item.quantity) /
+        0.9; // Reverse the discount
       quantityDiscount += itemSubtotal - itemPrice;
     }
   });
 
-  const subtotalAfterQuantityDiscount = subtotalBeforeDiscounts - quantityDiscount;
+  const subtotalAfterQuantityDiscount =
+    subtotalBeforeDiscounts - quantityDiscount;
 
   // Calculate bundle discount - uses productGetter internally
   const bundleDiscount = 0; // Simplified for now, as it requires product lookup
 
-  const subtotalAfterBundleDiscount = subtotalAfterQuantityDiscount - bundleDiscount;
+  const subtotalAfterBundleDiscount =
+    subtotalAfterQuantityDiscount - bundleDiscount;
 
   // Calculate promo discount
-  const promoDiscount = calculatePromoDiscount(subtotalAfterBundleDiscount, promoCode);
+  const promoDiscount = calculatePromoDiscount(
+    subtotalAfterBundleDiscount,
+    promoCode,
+  );
 
   const subtotalAfterAllDiscounts = subtotalAfterBundleDiscount - promoDiscount;
 

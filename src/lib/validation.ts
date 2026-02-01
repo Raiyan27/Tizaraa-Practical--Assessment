@@ -1,8 +1,8 @@
-import { Product, SelectedVariants } from '@/types/product';
-import { getVariantById } from '@/data/products';
+import { Product, SelectedVariants } from "@/types/product";
+import { getVariantById } from "@/data/products";
 
 export interface ValidationError {
-  field: 'color' | 'material' | 'size';
+  field: "color" | "material" | "size";
   message: string;
 }
 
@@ -11,37 +11,48 @@ export interface ValidationError {
  */
 export function validateVariantCombination(
   product: Product,
-  selectedVariants: SelectedVariants
+  selectedVariants: SelectedVariants,
 ): ValidationError[] {
   const errors: ValidationError[] = [];
 
-  const colorVariant = getVariantById(product, 'colors', selectedVariants.color);
-  const materialVariant = getVariantById(product, 'materials', selectedVariants.material);
-  const sizeVariant = getVariantById(product, 'sizes', selectedVariants.size);
+  const colorVariant = getVariantById(
+    product,
+    "colors",
+    selectedVariants.color,
+  );
+  const materialVariant = getVariantById(
+    product,
+    "materials",
+    selectedVariants.material,
+  );
+  const sizeVariant = getVariantById(product, "sizes", selectedVariants.size);
 
   if (!colorVariant) {
-    errors.push({ field: 'color', message: 'Selected color is not available' });
+    errors.push({ field: "color", message: "Selected color is not available" });
   }
 
   if (!materialVariant) {
-    errors.push({ field: 'material', message: 'Selected material is not available' });
+    errors.push({
+      field: "material",
+      message: "Selected material is not available",
+    });
   }
 
   if (!sizeVariant) {
-    errors.push({ field: 'size', message: 'Selected size is not available' });
+    errors.push({ field: "size", message: "Selected size is not available" });
   }
 
   // Check incompatibility between color and material
   if (colorVariant?.incompatibleWith?.includes(selectedVariants.material)) {
     errors.push({
-      field: 'material',
+      field: "material",
       message: `${materialVariant?.name} is not compatible with ${colorVariant.name}`,
     });
   }
 
   if (materialVariant?.incompatibleWith?.includes(selectedVariants.color)) {
     errors.push({
-      field: 'color',
+      field: "color",
       message: `${colorVariant?.name} is not compatible with ${materialVariant.name}`,
     });
   }
@@ -55,11 +66,19 @@ export function validateVariantCombination(
 export function checkVariantStock(
   product: Product,
   selectedVariants: SelectedVariants,
-  quantity: number
+  quantity: number,
 ): boolean {
-  const colorVariant = getVariantById(product, 'colors', selectedVariants.color);
-  const materialVariant = getVariantById(product, 'materials', selectedVariants.material);
-  const sizeVariant = getVariantById(product, 'sizes', selectedVariants.size);
+  const colorVariant = getVariantById(
+    product,
+    "colors",
+    selectedVariants.color,
+  );
+  const materialVariant = getVariantById(
+    product,
+    "materials",
+    selectedVariants.material,
+  );
+  const sizeVariant = getVariantById(product, "sizes", selectedVariants.size);
 
   if (!colorVariant || !materialVariant || !sizeVariant) {
     return false;
@@ -78,11 +97,19 @@ export function checkVariantStock(
  */
 export function getAvailableStock(
   product: Product,
-  selectedVariants: SelectedVariants
+  selectedVariants: SelectedVariants,
 ): number {
-  const colorVariant = getVariantById(product, 'colors', selectedVariants.color);
-  const materialVariant = getVariantById(product, 'materials', selectedVariants.material);
-  const sizeVariant = getVariantById(product, 'sizes', selectedVariants.size);
+  const colorVariant = getVariantById(
+    product,
+    "colors",
+    selectedVariants.color,
+  );
+  const materialVariant = getVariantById(
+    product,
+    "materials",
+    selectedVariants.material,
+  );
+  const sizeVariant = getVariantById(product, "sizes", selectedVariants.size);
 
   if (!colorVariant || !materialVariant || !sizeVariant) {
     return 0;
@@ -96,20 +123,22 @@ export function getAvailableStock(
  */
 export function isVariantIncompatible(
   product: Product,
-  variantType: 'colors' | 'materials' | 'sizes',
+  variantType: "colors" | "materials" | "sizes",
   variantId: string,
-  selectedVariants: SelectedVariants
+  selectedVariants: SelectedVariants,
 ): boolean {
   const variant = getVariantById(product, variantType, variantId);
 
   if (!variant) return false;
 
   // Check incompatibility based on variant type
-  if (variantType === 'colors') {
-    return variant.incompatibleWith?.includes(selectedVariants.material) || false;
+  if (variantType === "colors") {
+    return (
+      variant.incompatibleWith?.includes(selectedVariants.material) || false
+    );
   }
 
-  if (variantType === 'materials') {
+  if (variantType === "materials") {
     return variant.incompatibleWith?.includes(selectedVariants.color) || false;
   }
 

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useRef } from 'react';
-import { Mesh } from 'three';
-import { useFrame } from '@react-three/fiber';
+import { useRef } from "react";
+import { Mesh } from "three";
+import { useFrame } from "@react-three/fiber";
 
 interface VaseModelProps {
   color: string;
@@ -10,7 +10,11 @@ interface VaseModelProps {
   metalness?: number;
 }
 
-export function VaseModel({ color, roughness = 0.7, metalness = 0 }: VaseModelProps) {
+export function VaseModel({
+  color,
+  roughness = 0.7,
+  metalness = 0,
+}: VaseModelProps) {
   const vaseRef = useRef<Mesh>(null);
 
   useFrame((state) => {
@@ -22,7 +26,11 @@ export function VaseModel({ color, roughness = 0.7, metalness = 0 }: VaseModelPr
   return (
     <mesh ref={vaseRef} castShadow>
       <cylinderGeometry args={[0.6, 0.4, 2.5, 32]} />
-      <meshStandardMaterial color={color} roughness={roughness} metalness={metalness} />
+      <meshStandardMaterial
+        color={color}
+        roughness={roughness}
+        metalness={metalness}
+      />
     </mesh>
   );
 }
