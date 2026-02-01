@@ -171,7 +171,7 @@ export const products: Product[] = [
           id: "brushed",
           name: "Brushed Metal",
           priceModifier: 40,
-          stock: 15,
+          stock: 10,
           incompatibleWith: ["rose"],
         },
       ],

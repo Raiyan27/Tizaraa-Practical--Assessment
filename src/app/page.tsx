@@ -15,7 +15,7 @@ export default function Home() {
     loadCartFromStorage();
   }, [loadCartFromStorage]);
 
-  const cartItemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const cartItemCount = items.length;
 
   return (
     <div className="min-h-screen bg-blue-50">

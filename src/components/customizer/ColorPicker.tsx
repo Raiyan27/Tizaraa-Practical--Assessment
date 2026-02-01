@@ -1,13 +1,17 @@
 "use client";
 
-import { Variant } from "@/types/product";
+import { Variant, Product, SelectedVariants } from "@/types/product";
 import { Badge } from "../ui/Badge";
+import { CartItem } from "@/types/cart";
 
 interface ColorPickerProps {
   colors: Variant[];
   selectedColorId: string;
   onSelectColor: (colorId: string) => void;
   disabledColors?: string[];
+  product?: Product;
+  selectedVariants?: SelectedVariants;
+  cartItems?: CartItem[];
 }
 
 export function ColorPicker({
@@ -15,16 +19,38 @@ export function ColorPicker({
   selectedColorId,
   onSelectColor,
   disabledColors = [],
+  product,
+  selectedVariants,
+  cartItems = [],
 }: ColorPickerProps) {
+  const getActualStock = (colorId: string): number => {
+    const color = colors.find((c) => c.id === colorId);
+    if (!color || !product) return color?.stock || 0;
+
+    // Calculate how much of this color is already in cart across ALL combinations
+    const usedStock = cartItems.reduce((sum, item) => {
+      if (
+        item.productId === product.id &&
+        item.selectedVariants.color === colorId
+      ) {
+        return sum + item.quantity;
+      }
+      return sum;
+    }, 0);
+
+    return Math.max(0, color.stock - usedStock);
+  };
+
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-medium text-gray-900">Color</h3>
       <div className="flex flex-wrap gap-3">
         {colors.map((color) => {
+          const actualStock = getActualStock(color.id);
           const isSelected = color.id === selectedColorId;
           const isDisabled =
-            disabledColors.includes(color.id) || color.stock === 0;
-          const isLowStock = color.stock > 0 && color.stock <= 5;
+            disabledColors.includes(color.id) || actualStock === 0;
+          const isLowStock = actualStock > 0 && actualStock <= 5;
 
           return (
             <button
@@ -71,10 +97,10 @@ export function ColorPicker({
                 )}
                 {isLowStock && !isDisabled && (
                   <Badge variant="warning" className="text-xs mt-1">
-                    {color.stock} left
+                    {actualStock} left
                   </Badge>
                 )}
-                {color.stock === 0 && (
+                {actualStock === 0 && (
                   <Badge variant="error" className="text-xs mt-1">
                     Out of stock
                   </Badge>

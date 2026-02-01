@@ -120,12 +120,12 @@ export function getAvailableStock(
 
 /**
  * Gets the minimum available stock across all selected variants,
- * accounting for items already in the cart
+ * accounting for items already in the cart across ALL combinations
  */
 export function getAvailableStockForCart(
   product: Product,
   selectedVariants: SelectedVariants,
-  currentCartQuantity: number = 0,
+  cartItems: any[] = [],
 ): number {
   const colorVariant = getVariantById(
     product,
@@ -143,14 +143,44 @@ export function getAvailableStockForCart(
     return 0;
   }
 
-  // Get minimum stock, then subtract what's already in cart
-  const minStock = Math.min(
-    colorVariant.stock,
-    materialVariant.stock,
-    sizeVariant.stock,
-  );
-  const remaining = Math.max(0, minStock - currentCartQuantity);
-  return remaining;
+  // Calculate remaining stock for each variant independently
+  const colorUsed = cartItems.reduce((sum, item) => {
+    if (
+      item.productId === product.id &&
+      item.selectedVariants.color === selectedVariants.color
+    ) {
+      return sum + item.quantity;
+    }
+    return sum;
+  }, 0);
+
+  const materialUsed = cartItems.reduce((sum, item) => {
+    if (
+      item.productId === product.id &&
+      item.selectedVariants.material === selectedVariants.material
+    ) {
+      return sum + item.quantity;
+    }
+    return sum;
+  }, 0);
+
+  const sizeUsed = cartItems.reduce((sum, item) => {
+    if (
+      item.productId === product.id &&
+      item.selectedVariants.size === selectedVariants.size
+    ) {
+      return sum + item.quantity;
+    }
+    return sum;
+  }, 0);
+
+  // Calculate remaining stock for each variant
+  const colorRemaining = Math.max(0, colorVariant.stock - colorUsed);
+  const materialRemaining = Math.max(0, materialVariant.stock - materialUsed);
+  const sizeRemaining = Math.max(0, sizeVariant.stock - sizeUsed);
+
+  // The available stock for this combination is the minimum of all three
+  return Math.min(colorRemaining, materialRemaining, sizeRemaining);
 }
 
 /**

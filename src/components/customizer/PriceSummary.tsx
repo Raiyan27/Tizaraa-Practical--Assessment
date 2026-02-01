@@ -38,24 +38,11 @@ export function PriceSummary({
   );
   const sizeVariant = getVariantById(product, "sizes", selectedVariants.size);
 
-  // Calculate how many of this exact combination are already in cart
-  const cartQuantityForThisCombination = items.reduce((sum, item) => {
-    if (
-      item.productId === product.id &&
-      item.selectedVariants.color === selectedVariants.color &&
-      item.selectedVariants.material === selectedVariants.material &&
-      item.selectedVariants.size === selectedVariants.size
-    ) {
-      return sum + item.quantity;
-    }
-    return sum;
-  }, 0);
-
   // Get available stock, accounting for items already in cart
   const availableStock = getAvailableStockForCart(
     product,
     selectedVariants,
-    cartQuantityForThisCombination,
+    items,
   );
 
   const totalPrice = calculateProductPrice(product, selectedVariants, quantity);

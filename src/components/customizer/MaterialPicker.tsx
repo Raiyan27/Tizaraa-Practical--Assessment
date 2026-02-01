@@ -1,13 +1,17 @@
 "use client";
 
-import { Variant } from "@/types/product";
+import { Variant, Product, SelectedVariants } from "@/types/product";
 import { Badge } from "../ui/Badge";
+import { CartItem } from "@/types/cart";
 
 interface MaterialPickerProps {
   materials: Variant[];
   selectedMaterialId: string;
   onSelectMaterial: (materialId: string) => void;
   disabledMaterials?: string[];
+  product?: Product;
+  selectedVariants?: SelectedVariants;
+  cartItems?: CartItem[];
 }
 
 export function MaterialPicker({
@@ -15,16 +19,38 @@ export function MaterialPicker({
   selectedMaterialId,
   onSelectMaterial,
   disabledMaterials = [],
+  product,
+  selectedVariants,
+  cartItems = [],
 }: MaterialPickerProps) {
+  const getActualStock = (materialId: string): number => {
+    const material = materials.find((m) => m.id === materialId);
+    if (!material || !product) return material?.stock || 0;
+
+    // Calculate how much of this material is already in cart across ALL combinations
+    const usedStock = cartItems.reduce((sum, item) => {
+      if (
+        item.productId === product.id &&
+        item.selectedVariants.material === materialId
+      ) {
+        return sum + item.quantity;
+      }
+      return sum;
+    }, 0);
+
+    return Math.max(0, material.stock - usedStock);
+  };
+
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-medium text-gray-900">Material</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {materials.map((material) => {
+          const actualStock = getActualStock(material.id);
           const isSelected = material.id === selectedMaterialId;
           const isDisabled =
-            disabledMaterials.includes(material.id) || material.stock === 0;
-          const isLowStock = material.stock > 0 && material.stock <= 5;
+            disabledMaterials.includes(material.id) || actualStock === 0;
+          const isLowStock = actualStock > 0 && actualStock <= 5;
 
           return (
             <button
@@ -65,10 +91,10 @@ export function MaterialPicker({
               </div>
               {isLowStock && !isDisabled && (
                 <Badge variant="warning" className="text-xs mt-2">
-                  Only {material.stock} left
+                  Only {actualStock} left
                 </Badge>
               )}
-              {material.stock === 0 && (
+              {actualStock === 0 && (
                 <Badge variant="error" className="text-xs mt-2">
                   Out of stock
                 </Badge>

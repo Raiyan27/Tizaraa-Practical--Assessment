@@ -1,27 +1,53 @@
 "use client";
 
-import { Variant } from "@/types/product";
+import { Variant, Product, SelectedVariants } from "@/types/product";
 import { Badge } from "../ui/Badge";
+import { CartItem } from "@/types/cart";
 
 interface SizePickerProps {
   sizes: Variant[];
   selectedSizeId: string;
   onSelectSize: (sizeId: string) => void;
+  product?: Product;
+  selectedVariants?: SelectedVariants;
+  cartItems?: CartItem[];
 }
 
 export function SizePicker({
   sizes,
   selectedSizeId,
   onSelectSize,
+  product,
+  selectedVariants,
+  cartItems = [],
 }: SizePickerProps) {
+  const getActualStock = (sizeId: string): number => {
+    const size = sizes.find((s) => s.id === sizeId);
+    if (!size || !product) return size?.stock || 0;
+
+    // Calculate how much of this size is already in cart across ALL combinations
+    const usedStock = cartItems.reduce((sum, item) => {
+      if (
+        item.productId === product.id &&
+        item.selectedVariants.size === sizeId
+      ) {
+        return sum + item.quantity;
+      }
+      return sum;
+    }, 0);
+
+    return Math.max(0, size.stock - usedStock);
+  };
+
   return (
     <div className="space-y-3">
       <h3 className="text-sm font-medium text-gray-900">Size</h3>
       <div className="flex flex-wrap gap-3">
         {sizes.map((size) => {
+          const actualStock = getActualStock(size.id);
           const isSelected = size.id === selectedSizeId;
-          const isOutOfStock = size.stock === 0;
-          const isLowStock = size.stock > 0 && size.stock <= 5;
+          const isOutOfStock = actualStock === 0;
+          const isLowStock = actualStock > 0 && actualStock <= 5;
 
           return (
             <button
@@ -43,7 +69,7 @@ export function SizePicker({
                 )}
                 {isLowStock && !isOutOfStock && (
                   <Badge variant="warning" className="text-xs">
-                    {size.stock} left
+                    {actualStock} left
                   </Badge>
                 )}
                 {isOutOfStock && (

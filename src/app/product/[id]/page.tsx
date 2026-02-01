@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { getProductById } from "@/data/products";
 import { useConfigurationStore } from "@/store/configurationStore";
 import { useCartStore } from "@/store/cartStore";
@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/Badge";
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const productId = params.id as string;
 
   const {
@@ -31,15 +32,62 @@ export default function ProductPage() {
   } = useConfigurationStore();
 
   const { addProduct } = useRecentlyViewed();
-  const { addItem } = useCartStore();
+  const { addItem, items: cartItems } = useCartStore();
   const product = getProductById(productId);
 
+  // Initialize from URL or product defaults
   useEffect(() => {
     if (product) {
-      initializeFromProduct(product);
+      const urlColor = searchParams.get("color");
+      const urlMaterial = searchParams.get("material");
+      const urlSize = searchParams.get("size");
+
+      // Check if URL params are valid variants
+      const colorExists =
+        urlColor && product.variants.colors.some((c) => c.id === urlColor);
+      const materialExists =
+        urlMaterial &&
+        product.variants.materials.some((m) => m.id === urlMaterial);
+      const sizeExists =
+        urlSize && product.variants.sizes.some((s) => s.id === urlSize);
+
+      if (colorExists && materialExists && sizeExists) {
+        // Initialize from URL
+        setColor(urlColor!);
+        setMaterial(urlMaterial!);
+        setSize(urlSize!);
+      } else {
+        // Initialize from product defaults
+        initializeFromProduct(product);
+      }
+
       addProduct(productId);
     }
-  }, [productId]);
+  }, [productId, product]);
+
+  // Update URL when variants change
+  const handleColorChange = (colorId: string) => {
+    setColor(colorId);
+    updateUrl(colorId, selectedVariants.material, selectedVariants.size);
+  };
+
+  const handleMaterialChange = (materialId: string) => {
+    setMaterial(materialId);
+    updateUrl(selectedVariants.color, materialId, selectedVariants.size);
+  };
+
+  const handleSizeChange = (sizeId: string) => {
+    setSize(sizeId);
+    updateUrl(selectedVariants.color, selectedVariants.material, sizeId);
+  };
+
+  const updateUrl = (color: string, material: string, size: string) => {
+    const url = new URLSearchParams();
+    url.set("color", color);
+    url.set("material", material);
+    url.set("size", size);
+    router.replace(`?${url.toString()}`, { scroll: false });
+  };
 
   if (!product) {
     return (
@@ -167,21 +215,30 @@ export default function ProductPage() {
               <ColorPicker
                 colors={product.variants.colors}
                 selectedColorId={selectedVariants.color}
-                onSelectColor={setColor}
+                onSelectColor={handleColorChange}
                 disabledColors={disabledColors}
+                product={product}
+                selectedVariants={selectedVariants}
+                cartItems={cartItems}
               />
 
               <MaterialPicker
                 materials={product.variants.materials}
                 selectedMaterialId={selectedVariants.material}
-                onSelectMaterial={setMaterial}
+                onSelectMaterial={handleMaterialChange}
                 disabledMaterials={disabledMaterials}
+                product={product}
+                selectedVariants={selectedVariants}
+                cartItems={cartItems}
               />
 
               <SizePicker
                 sizes={product.variants.sizes}
                 selectedSizeId={selectedVariants.size}
-                onSelectSize={setSize}
+                onSelectSize={handleSizeChange}
+                product={product}
+                selectedVariants={selectedVariants}
+                cartItems={cartItems}
               />
             </div>
 
