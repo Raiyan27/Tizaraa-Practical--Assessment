@@ -47,8 +47,8 @@ export function SavedItem({ item, onMoveToCart, onRemove }: SavedItemProps) {
   );
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-      <div className="flex gap-4">
+    <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
+      <div className="flex gap-3 sm:gap-4">
         {/* Static 3D Preview */}
         <div className="shrink-0">
           <StaticProductPreview
@@ -60,23 +60,23 @@ export function SavedItem({ item, onMoveToCart, onRemove }: SavedItemProps) {
 
         {/* Product Details */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-4 mb-2">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-2">
+            <div className="min-w-0">
               <Link
                 href={`/product/${item.productId}`}
-                className="font-semibold text-gray-900 hover:text-blue-600"
+                className="text-base sm:text-lg font-semibold text-gray-900 hover:text-blue-600 line-clamp-2"
               >
                 {product.name}
               </Link>
-              <div className="flex flex-wrap gap-2 mt-1 text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-1 sm:gap-2 mt-1 text-xs sm:text-sm text-gray-600">
                 <span>Color: {colorVariant?.name}</span>
-                <span>•</span>
+                <span className="hidden sm:inline">•</span>
                 <span>Material: {materialVariant?.name}</span>
-                <span>•</span>
+                <span className="hidden sm:inline">•</span>
                 <span>Size: {sizeVariant?.name}</span>
               </div>
             </div>
-            <PriceDisplay amount={price} className="font-bold" />
+            <PriceDisplay amount={price} className="font-bold shrink-0" />
           </div>
 
           {/* Stock Status */}
@@ -85,18 +85,18 @@ export function SavedItem({ item, onMoveToCart, onRemove }: SavedItemProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 text-xs sm:text-sm">
             <button
               onClick={onMoveToCart}
               disabled={!hasStock}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
+              className="text-blue-600 hover:text-blue-700 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
             >
               {hasStock ? "Move to Cart" : "Out of Stock"}
             </button>
             <span className="text-gray-300">|</span>
             <button
               onClick={onRemove}
-              className="text-sm text-red-600 hover:text-red-700 font-medium"
+              className="text-red-600 hover:text-red-700 font-medium"
             >
               Remove
             </button>

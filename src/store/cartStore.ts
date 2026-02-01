@@ -236,6 +236,7 @@ export const useCartStore = create<CartState>((set, get) => {
           productId: item.productId,
           selectedVariants: item.selectedVariants,
           quantity: item.quantity,
+          addedAt: item.addedAt,
           savedAt: new Date().toISOString(),
         };
 

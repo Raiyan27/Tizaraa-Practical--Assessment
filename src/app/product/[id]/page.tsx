@@ -37,7 +37,6 @@ export default function ProductPage() {
   useEffect(() => {
     if (product) {
       initializeFromProduct(product);
-      // Track as recently viewed
       addProduct(productId);
     }
   }, [productId]);

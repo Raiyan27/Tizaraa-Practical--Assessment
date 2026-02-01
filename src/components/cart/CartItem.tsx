@@ -50,39 +50,42 @@ export function CartItem({
   );
 
   return (
-    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-      <div className="flex gap-4">
+    <div className="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-200">
+      <div className="flex gap-3 sm:gap-4">
         {/* Static 3D Preview */}
         <div className="shrink-0">
           <StaticProductPreview
             product={product}
             selectedVariants={item.selectedVariants}
-            size={96}
+            size={80}
           />
         </div>
 
         {/* Product Details */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-4 mb-2">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-2">
+            <div className="min-w-0">
               <Link
                 href={`/product/${item.productId}`}
-                className="text-lg font-semibold text-gray-900 hover:text-blue-600"
+                className="text-base sm:text-lg font-semibold text-gray-900 hover:text-blue-600 line-clamp-2"
               >
                 {product.name}
               </Link>
-              <div className="flex flex-wrap gap-2 mt-1 text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-1 sm:gap-2 mt-1 text-xs sm:text-sm text-gray-600">
                 <span>Color: {colorVariant?.name}</span>
-                <span>•</span>
+                <span className="hidden sm:inline">•</span>
                 <span>Material: {materialVariant?.name}</span>
-                <span>•</span>
+                <span className="hidden sm:inline">•</span>
                 <span>Size: {sizeVariant?.name}</span>
               </div>
             </div>
-            <div className="text-right">
-              <PriceDisplay amount={price} className="text-lg font-bold" />
+            <div className="text-right shrink-0">
+              <PriceDisplay
+                amount={price}
+                className="text-base sm:text-lg font-bold"
+              />
               {item.quantity > 1 && (
-                <div className="text-sm text-gray-500">
+                <div className="text-xs sm:text-sm text-gray-500">
                   <PriceDisplay amount={price / item.quantity} /> each
                 </div>
               )}
@@ -97,7 +100,7 @@ export function CartItem({
           )}
 
           {/* Quantity & Actions */}
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-row items-center justify-between gap-2 sm:gap-3">
             <QuantitySelector
               value={item.quantity}
               onChange={onUpdateQuantity}
@@ -105,17 +108,17 @@ export function CartItem({
               max={availableStock}
             />
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 text-xs sm:text-sm">
               <button
                 onClick={onSaveForLater}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-blue-600 hover:text-blue-700 font-medium"
               >
-                Save for Later
+                Save
               </button>
               <span className="text-gray-300">|</span>
               <button
                 onClick={onRemove}
-                className="text-sm text-red-600 hover:text-red-700 font-medium"
+                className="text-red-600 hover:text-red-700 font-medium"
               >
                 Remove
               </button>

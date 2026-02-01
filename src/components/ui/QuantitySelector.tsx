@@ -44,7 +44,7 @@ export function QuantitySelector({
         size="sm"
         onClick={handleDecrement}
         disabled={value <= min}
-        className="px-3 rounded-r-none"
+        className="px-3 rounded-l-lg rounded-r-none"
       >
         −
       </Button>
@@ -61,7 +61,7 @@ export function QuantitySelector({
         size="sm"
         onClick={handleIncrement}
         disabled={value >= max}
-        className="px-3 rounded-l-none"
+        className="px-3 rounded-r-lg rounded-l-none"
       >
         +
       </Button>
