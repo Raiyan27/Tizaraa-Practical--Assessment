@@ -119,6 +119,41 @@ export function getAvailableStock(
 }
 
 /**
+ * Gets the minimum available stock across all selected variants,
+ * accounting for items already in the cart
+ */
+export function getAvailableStockForCart(
+  product: Product,
+  selectedVariants: SelectedVariants,
+  currentCartQuantity: number = 0,
+): number {
+  const colorVariant = getVariantById(
+    product,
+    "colors",
+    selectedVariants.color,
+  );
+  const materialVariant = getVariantById(
+    product,
+    "materials",
+    selectedVariants.material,
+  );
+  const sizeVariant = getVariantById(product, "sizes", selectedVariants.size);
+
+  if (!colorVariant || !materialVariant || !sizeVariant) {
+    return 0;
+  }
+
+  // Get minimum stock, then subtract what's already in cart
+  const minStock = Math.min(
+    colorVariant.stock,
+    materialVariant.stock,
+    sizeVariant.stock,
+  );
+  const remaining = Math.max(0, minStock - currentCartQuantity);
+  return remaining;
+}
+
+/**
  * Checks if a variant is incompatible with currently selected variants
  */
 export function isVariantIncompatible(

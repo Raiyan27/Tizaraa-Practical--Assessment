@@ -31,16 +31,19 @@ export const useConfigurationStore = create<ConfigurationState>((set) => ({
   setColor: (colorId: string) =>
     set((state) => ({
       selectedVariants: { ...state.selectedVariants, color: colorId },
+      quantity: 1,
     })),
 
   setMaterial: (materialId: string) =>
     set((state) => ({
       selectedVariants: { ...state.selectedVariants, material: materialId },
+      quantity: 1,
     })),
 
   setSize: (sizeId: string) =>
     set((state) => ({
       selectedVariants: { ...state.selectedVariants, size: sizeId },
+      quantity: 1,
     })),
 
   setQuantity: (quantity: number) =>

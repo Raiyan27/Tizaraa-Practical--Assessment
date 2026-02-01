@@ -3,6 +3,8 @@
 import { Product, SelectedVariants } from "@/types/product";
 import { calculateProductPrice } from "@/lib/pricing";
 import { getVariantById } from "@/data/products";
+import { getAvailableStockForCart } from "@/lib/validation";
+import { useCartStore } from "@/store/cartStore";
 import { PriceDisplay } from "../ui/PriceDisplay";
 import { QuantitySelector } from "../ui/QuantitySelector";
 import { Button } from "../ui/Button";
@@ -22,6 +24,8 @@ export function PriceSummary({
   onQuantityChange,
   onAddToCart,
 }: PriceSummaryProps) {
+  const { items } = useCartStore();
+
   const colorVariant = getVariantById(
     product,
     "colors",
@@ -33,6 +37,26 @@ export function PriceSummary({
     selectedVariants.material,
   );
   const sizeVariant = getVariantById(product, "sizes", selectedVariants.size);
+
+  // Calculate how many of this exact combination are already in cart
+  const cartQuantityForThisCombination = items.reduce((sum, item) => {
+    if (
+      item.productId === product.id &&
+      item.selectedVariants.color === selectedVariants.color &&
+      item.selectedVariants.material === selectedVariants.material &&
+      item.selectedVariants.size === selectedVariants.size
+    ) {
+      return sum + item.quantity;
+    }
+    return sum;
+  }, 0);
+
+  // Get available stock, accounting for items already in cart
+  const availableStock = getAvailableStockForCart(
+    product,
+    selectedVariants,
+    cartQuantityForThisCombination,
+  );
 
   const totalPrice = calculateProductPrice(product, selectedVariants, quantity);
   const hasQuantityDiscount = quantity >= 5;
@@ -105,7 +129,23 @@ export function PriceSummary({
         <label className="block text-sm font-medium text-gray-700">
           Quantity
         </label>
-        <QuantitySelector value={quantity} onChange={onQuantityChange} />
+        <QuantitySelector
+          value={quantity}
+          onChange={onQuantityChange}
+          max={Math.min(99, availableStock)}
+        />
+        {availableStock < 99 && availableStock > 0 && (
+          <p className="text-xs text-amber-600 font-medium">
+            {availableStock === 1
+              ? "Only 1 item left in stock"
+              : `Only ${availableStock} items left in stock`}
+          </p>
+        )}
+        {availableStock === 0 && (
+          <p className="text-xs text-red-600 font-medium">
+            This combination is out of stock
+          </p>
+        )}
         {hasQuantityDiscount && (
           <p className="text-xs text-green-600 font-medium">
             🎉 10% discount applied for 5+ items!
@@ -122,8 +162,13 @@ export function PriceSummary({
           />
         </div>
 
-        <Button onClick={onAddToCart} className="w-full" size="lg">
-          Add to Cart
+        <Button
+          onClick={onAddToCart}
+          className="w-full"
+          size="lg"
+          disabled={availableStock === 0}
+        >
+          {availableStock === 0 ? "Out of Stock" : "Add to Cart"}
         </Button>
       </div>
     </div>

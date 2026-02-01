@@ -81,6 +81,7 @@ export default function ProductPage() {
     try {
       await addItem(productId, selectedVariants, quantity);
       alert(`✓ Added to cart! (${quantity} item${quantity > 1 ? "s" : ""})`);
+      setQuantity(1);
     } catch (error) {
       alert(
         `Error: ${error instanceof Error ? error.message : "Could not add to cart"}`,
