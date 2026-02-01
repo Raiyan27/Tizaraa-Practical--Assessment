@@ -1,0 +1,68 @@
+import React from 'react';
+import { Button } from './Button';
+
+interface QuantitySelectorProps {
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  className?: string;
+}
+
+export function QuantitySelector({ 
+  value, 
+  onChange, 
+  min = 1, 
+  max = 99,
+  className = '' 
+}: QuantitySelectorProps) {
+  const handleDecrement = () => {
+    if (value > min) {
+      onChange(value - 1);
+    }
+  };
+
+  const handleIncrement = () => {
+    if (value < max) {
+      onChange(value + 1);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseInt(e.target.value, 10);
+    if (!isNaN(newValue) && newValue >= min && newValue <= max) {
+      onChange(newValue);
+    }
+  };
+
+  return (
+    <div className={`inline-flex items-center border border-gray-300 rounded-lg ${className}`}>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleDecrement}
+        disabled={value <= min}
+        className="px-3 rounded-r-none"
+      >
+        −
+      </Button>
+      <input
+        type="number"
+        value={value}
+        onChange={handleInputChange}
+        min={min}
+        max={max}
+        className="w-16 text-center border-x border-gray-300 py-1 focus:outline-none"
+      />
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleIncrement}
+        disabled={value >= max}
+        className="px-3 rounded-l-none"
+      >
+        +
+      </Button>
+    </div>
+  );
+}
