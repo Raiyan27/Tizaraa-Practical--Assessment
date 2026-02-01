@@ -13,6 +13,7 @@ export interface PriceBreakdown {
   tax: number;
   shipping: number;
   total: number;
+  itemCount: number;
 }
 
 /**
@@ -153,9 +154,18 @@ export function calculateShipping(
  */
 export function calculateCartSummary(
   items: CartItem[],
-  promoCode?: PromoCode,
+  promoCodeStr?: string,
   productGetter: (id: string) => Product | undefined = getProductById,
 ): PriceBreakdown {
+  // Get promo code object if string provided
+  const { getPromoCodeByCode } = require('@/data/promo-codes');
+  const promoCode: PromoCode | undefined = promoCodeStr
+    ? getPromoCodeByCode(promoCodeStr)
+    : undefined;
+
+  // Calculate total item count
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
   // Calculate base price for all items
   let basePrice = 0;
   let variantModifiers = 0;
@@ -243,5 +253,6 @@ export function calculateCartSummary(
     tax,
     shipping,
     total,
+    itemCount,
   };
 }

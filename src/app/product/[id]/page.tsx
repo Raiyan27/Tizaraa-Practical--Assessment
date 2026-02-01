@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getProductById } from "@/data/products";
 import { useConfigurationStore } from "@/store/configurationStore";
+import { useCartStore } from "@/store/cartStore";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { ProductViewer } from "@/components/3d/ProductViewer";
 import { ColorPicker } from "@/components/customizer/ColorPicker";
 import { MaterialPicker } from "@/components/customizer/MaterialPicker";
@@ -28,30 +30,36 @@ export default function ProductPage() {
     initializeFromProduct,
   } = useConfigurationStore();
 
+  const { addProduct } = useRecentlyViewed();
+  const { addItem } = useCartStore();
   const product = getProductById(productId);
 
   useEffect(() => {
     if (product) {
       initializeFromProduct(product);
+      // Track as recently viewed
+      addProduct(productId);
     }
-  }, [product, initializeFromProduct]);
+  }, [productId]);
 
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Product Not Found
-          </h1>
-          <p className="text-gray-600 mb-4">
-            The product you&apos;re looking for doesn&apos;t exist.
-          </p>
-          <button
-            onClick={() => router.push("/")}
-            className="text-blue-600 hover:text-blue-700 font-medium"
-          >
-            ← Back to Home
-          </button>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-100">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Product Not Found
+            </h2>
+            <p className="text-gray-600 mb-6">
+              The product you&apos;re looking for doesn&apos;t exist.
+            </p>
+            <button
+              onClick={() => router.push("/")}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            >
+              ← Back to Home
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -70,9 +78,15 @@ export default function ProductPage() {
     )
     .map((m) => m.id);
 
-  const handleAddToCart = () => {
-    alert("Cart functionality coming soon! Configuration saved.");
-    console.log("Add to cart:", { productId, selectedVariants, quantity });
+  const handleAddToCart = async () => {
+    try {
+      await addItem(productId, selectedVariants, quantity);
+      alert(`✓ Added to cart! (${quantity} item${quantity > 1 ? "s" : ""})`);
+    } catch (error) {
+      alert(
+        `Error: ${error instanceof Error ? error.message : "Could not add to cart"}`,
+      );
+    }
   };
 
   if (!selectedVariants.color) {

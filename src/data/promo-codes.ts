@@ -27,6 +27,15 @@ export const promoCodes: PromoCode[] = [
   },
 ];
 
+/**
+ * Get promo code by code string
+ */
+export function getPromoCodeByCode(code: string): PromoCode | undefined {
+  return promoCodes.find(
+    (p) => p.code.toUpperCase() === code.toUpperCase()
+  );
+}
+
 export function validatePromoCode(
   code: string,
   subtotal: number,

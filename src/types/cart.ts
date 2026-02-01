@@ -23,8 +23,13 @@ export interface Cart {
 
 export interface CartSummary {
   subtotal: number;
-  discount: number;
+  discounts: {
+    quantity: number;
+    bundle: number;
+    promo: number;
+  };
   tax: number;
   shipping: number;
   total: number;
+  itemCount: number;
 }
