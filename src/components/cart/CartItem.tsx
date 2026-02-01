@@ -133,23 +133,27 @@ export const CartItem = memo(function CartItem({
           <button
             onClick={handleSaveForLater}
             disabled={isLoading}
-            className={`font-medium active:text-blue-800 ${
+            className={`font-medium active:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md px-2 py-1 ${
               isLoading
                 ? "text-gray-400 cursor-not-allowed"
                 : "text-blue-600 hover:text-blue-700"
             }`}
+            aria-label={`Save ${product.name} for later`}
+            type="button"
           >
             {isLoading ? "Saving..." : "Save for later"}
           </button>
-          <span className="text-gray-300">|</span>
+          <span className="text-gray-300" aria-hidden="true">|</span>
           <button
             onClick={handleRemove}
             disabled={isLoading}
-            className={`font-medium active:text-red-800 ${
+            className={`font-medium active:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-md px-2 py-1 ${
               isLoading
                 ? "text-gray-400 cursor-not-allowed"
                 : "text-red-600 hover:text-red-700"
             }`}
+            aria-label={`Remove ${product.name} from cart`}
+            type="button"
           >
             {isLoading ? "Removing..." : "Remove"}
           </button>

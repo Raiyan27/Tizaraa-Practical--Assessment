@@ -43,6 +43,8 @@ export const QuantitySelector = memo(function QuantitySelector({
   return (
     <div
       className={`inline-flex items-center border border-gray-300 rounded-lg ${className}`}
+      role="group"
+      aria-label="Quantity selector"
     >
       <Button
         variant="ghost"
@@ -50,6 +52,8 @@ export const QuantitySelector = memo(function QuantitySelector({
         onClick={handleDecrement}
         disabled={value <= min || isLoading}
         className="px-3 rounded-l-lg rounded-r-none"
+        aria-label="Decrease quantity"
+        type="button"
       >
         −
       </Button>
@@ -60,7 +64,11 @@ export const QuantitySelector = memo(function QuantitySelector({
         min={min}
         max={max}
         disabled={isLoading}
-        className="w-16 text-center border-x border-gray-300 py-1 focus:outline-none disabled:bg-gray-50 disabled:text-gray-400"
+        className="w-16 text-center border-x border-gray-300 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-400"
+        aria-label="Quantity"
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-valuenow={value}
       />
       <Button
         variant="ghost"
@@ -68,6 +76,8 @@ export const QuantitySelector = memo(function QuantitySelector({
         onClick={handleIncrement}
         disabled={value >= max || isLoading}
         className="px-3 rounded-r-lg rounded-l-none"
+        aria-label="Increase quantity"
+        type="button"
       >
         +
       </Button>

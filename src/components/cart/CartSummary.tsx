@@ -162,7 +162,9 @@ export const CartSummary = memo(function CartSummary({
                 </div>
                 <button
                   onClick={() => handleRemovePromo(code)}
-                  className="text-xs sm:text-sm text-red-600 hover:text-red-700"
+                  className="text-xs sm:text-sm text-red-600 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded-md px-2 py-1"
+                  aria-label={`Remove promo code ${code}`}
+                  type="button"
                 >
                   Remove
                 </button>

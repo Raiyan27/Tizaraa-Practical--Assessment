@@ -39,12 +39,15 @@ const FilterSection = memo(function FilterSection({
     <div className="border-b border-gray-200 last:border-b-0">
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between py-3 px-1 text-left hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between py-3 px-1 text-left hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset rounded-md"
+        aria-expanded={isOpen}
+        aria-controls={`filter-section-${title.toLowerCase().replace(/\s+/g, '-')}`}
+        type="button"
       >
         <div className="flex items-center gap-2">
           <span className="font-medium text-gray-900">{title}</span>
           {badge !== undefined && badge > 0 && (
-            <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
+            <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full" aria-label={`${badge} options available`}>
               {badge}
             </span>
           )}
@@ -56,6 +59,7 @@ const FilterSection = memo(function FilterSection({
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -65,7 +69,14 @@ const FilterSection = memo(function FilterSection({
           />
         </svg>
       </button>
-      {isOpen && <div className="pb-4 px-1">{children}</div>}
+      {isOpen && (
+        <div
+          className="pb-4 px-1"
+          id={`filter-section-${title.toLowerCase().replace(/\s+/g, '-')}`}
+        >
+          {children}
+        </div>
+      )}
     </div>
   );
 });

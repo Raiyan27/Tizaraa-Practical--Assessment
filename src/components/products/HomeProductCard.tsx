@@ -17,7 +17,8 @@ export const HomeProductCard = memo(function HomeProductCard({
   return (
     <Link
       href={`/product/${product.id}`}
-      className="group bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all transform hover:-translate-y-1"
+      className="group bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      aria-label={`View details for ${product.name}, ${product.rating} stars, ${product.reviewCount} reviews, starting at $${product.basePrice}`}
     >
       {/* Product 3D Preview */}
       <div className="h-64 bg-linear-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
@@ -51,11 +52,11 @@ export const HomeProductCard = memo(function HomeProductCard({
         </p>
 
         <div className="flex items-center gap-2 mb-4">
-          <div className="flex items-center gap-1">
-            <span className="text-yellow-400">★</span>
+          <div className="flex items-center gap-1" role="group" aria-label={`Rating: ${product.rating} out of 5 stars`}>
+            <span className="text-yellow-400" aria-hidden="true">★</span>
             <span className="font-medium text-sm">{product.rating}</span>
           </div>
-          <span className="text-gray-400 text-sm">•</span>
+          <span className="text-gray-400 text-sm" aria-hidden="true">•</span>
           <span className="text-gray-500 text-sm">
             {product.reviewCount} reviews
           </span>

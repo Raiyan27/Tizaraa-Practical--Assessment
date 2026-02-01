@@ -35,13 +35,16 @@ export const MultiSelectFilter = memo(function MultiSelectFilter({
             key={option.id}
             onClick={() => onToggle(option.id)}
             disabled={option.count === 0 && !isSelected}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-all ${
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset ${
               option.count === 0 && !isSelected
                 ? "opacity-50 cursor-not-allowed"
                 : isSelected
                   ? "bg-blue-50 border border-blue-200"
                   : "hover:bg-gray-50"
             }`}
+            aria-pressed={isSelected}
+            aria-label={`${option.name} filter${isSelected ? ' selected' : ''}, ${option.count} items`}
+            type="button"
           >
             <div className="flex items-center gap-3">
               {/* Checkbox */}
@@ -97,7 +100,9 @@ export const MultiSelectFilter = memo(function MultiSelectFilter({
       {hasMore && (
         <button
           onClick={toggleShowAll}
-          className="w-full text-sm text-blue-600 hover:text-blue-700 py-2 font-medium"
+          className="w-full text-sm text-blue-600 hover:text-blue-700 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset rounded-md"
+          aria-expanded={showAll}
+          type="button"
         >
           {showAll ? "Show Less" : `Show ${options.length - maxVisible} More`}
         </button>

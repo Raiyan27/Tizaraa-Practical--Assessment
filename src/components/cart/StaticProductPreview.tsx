@@ -120,12 +120,15 @@ export const StaticProductPreview = memo(function StaticProductPreview({
     <div
       className="rounded-lg overflow-hidden bg-linear-to-br from-gray-100 to-gray-200"
       style={{ width: size + 100, height: size + 100 }}
+      role="img"
+      aria-label={`3D preview of ${product.name} in ${colorVariant?.name || 'selected'} color`}
     >
       <Canvas
         camera={{ position: [3.5, 1, 2], fov: 45 }}
         gl={{ preserveDrawingBuffer: true, antialias: true }}
         frameloop="demand"
         style={{ width: size + 100, height: size + 100 }}
+        aria-hidden="true"
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={0.8} />
