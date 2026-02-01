@@ -33,3 +33,26 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: jest.fn(),
   })),
 });
+
+// Mock IndexedDB
+const mockIndexedDB = {
+  open: jest.fn(),
+  deleteDatabase: jest.fn(),
+  databases: jest.fn(),
+  cmp: jest.fn(),
+};
+
+Object.defineProperty(window, "indexedDB", {
+  writable: true,
+  value: mockIndexedDB,
+});
+
+// Mock BroadcastChannel
+global.BroadcastChannel = class BroadcastChannel {
+  constructor() {}
+  postMessage() {}
+  close() {}
+  addEventListener() {}
+  removeEventListener() {}
+  dispatchEvent() {}
+};

@@ -2,6 +2,7 @@ import { Product, SelectedVariants } from "@/types/product";
 import { CartItem } from "@/types/cart";
 import { PromoCode } from "@/types/promo";
 import { getVariantById, getProductById } from "@/data/products";
+import { getPromoCodeByCode } from "@/data/promo-codes";
 
 export interface PriceBreakdown {
   basePrice: number;
@@ -192,8 +193,6 @@ export function calculateCartSummary(
   productGetter: (id: string) => Product | undefined = getProductById,
 ): PriceBreakdown {
   // Get promo code objects
-  const { getPromoCodeByCode } = require("@/data/promo-codes");
-
   let promoCodes: PromoCode[] = [];
   if (promoCodesStr) {
     if (typeof promoCodesStr === "string") {

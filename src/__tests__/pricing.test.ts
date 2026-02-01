@@ -2,6 +2,7 @@ import {
   calculateProductPrice,
   calculatePromoDiscount,
   calculateCartSummary,
+  calculatePromoDiscounts,
 } from "../lib/pricing";
 import { Product, SelectedVariants } from "../types/product";
 import { CartItem } from "../types/cart";
@@ -118,6 +119,68 @@ describe("Pricing Engine", () => {
     });
   });
 
+  describe("calculatePromoDiscounts", () => {
+    it("should calculate percentage discount for multiple codes", () => {
+      const promoCodes: PromoCode[] = [
+        {
+          code: "TEST10",
+          discountType: "percentage",
+          discountValue: 10,
+          validUntil: "2026-12-31T23:59:59.000Z",
+        },
+        {
+          code: "EXTRA5",
+          discountType: "percentage",
+          discountValue: 5,
+          validUntil: "2026-12-31T23:59:59.000Z",
+        },
+      ];
+      const discount = calculatePromoDiscounts(200, promoCodes);
+      // First: 10% of 200 = 20, remaining: 180
+      // Second: 5% of 180 = 9, total discount: 29
+      expect(discount).toBe(29);
+    });
+
+    it("should calculate mixed discount types (percentage + fixed)", () => {
+      const promoCodes: PromoCode[] = [
+        {
+          code: "TEST10",
+          discountType: "percentage",
+          discountValue: 10,
+          validUntil: "2026-12-31T23:59:59.000Z",
+        },
+        {
+          code: "SAVE25",
+          discountType: "fixed",
+          discountValue: 25,
+          validUntil: "2026-12-31T23:59:59.000Z",
+        },
+      ];
+      const discount = calculatePromoDiscounts(200, promoCodes);
+      // First: 10% of 200 = 20, remaining: 180
+      // Second: min(25, 180) = 25, total discount: 45
+      expect(discount).toBe(45);
+    });
+
+    it("should cap fixed discounts at remaining subtotal", () => {
+      const promoCodes: PromoCode[] = [
+        {
+          code: "BIGSALE",
+          discountType: "fixed",
+          discountValue: 50,
+          validUntil: "2026-12-31T23:59:59.000Z",
+        },
+      ];
+      const discount = calculatePromoDiscounts(30, promoCodes);
+      expect(discount).toBe(30); // Capped at subtotal
+    });
+
+    it("should return 0 for empty promo codes array", () => {
+      const discount = calculatePromoDiscounts(200, []);
+      expect(discount).toBe(0);
+    });
+  });
+
   describe("calculateCartSummary", () => {
     // Mock product getter for tests
     const mockProductGetter = (id: string) => {
@@ -146,8 +209,8 @@ describe("Pricing Engine", () => {
       expect(summary.variantModifiers).toBe(0); // No modifiers
       expect(summary.subtotal).toBe(200);
       expect(summary.tax).toBe(16); // 8% of 200
-      expect(summary.shipping).toBe(0); // Free shipping (over $75)
-      expect(summary.total).toBe(216); // 200 + 16 + 0
+      expect(summary.shipping).toBe(10); // Standard shipping
+      expect(summary.total).toBe(226); // 200 + 16 + 10
     });
 
     it("should apply shipping fee for orders under $75", () => {
@@ -199,16 +262,24 @@ describe("Pricing Engine", () => {
         },
       ];
 
-      const promoCode: PromoCode = {
-        code: "TEST10",
-        discountType: "percentage",
-        discountValue: 10,
-        validUntil: "2026-12-31T23:59:59.000Z",
-      };
+      const promoCodes: PromoCode[] = [
+        {
+          code: "TEST10",
+          discountType: "percentage",
+          discountValue: 10,
+          validUntil: "2026-12-31T23:59:59.000Z",
+        },
+        {
+          code: "SAVE25",
+          discountType: "fixed",
+          discountValue: 25,
+          validUntil: "2026-12-31T23:59:59.000Z",
+        },
+      ];
 
       const summary = calculateCartSummary(
         cartItems,
-        promoCode.code,
+        promoCodes.map((p) => p.code),
         mockProductGetter,
       );
 

@@ -1,5 +1,21 @@
 import { useCartStore } from "../store/cartStore";
 
+// Mock IndexedDB functions
+jest.mock("../lib/indexedDb", () => ({
+  saveCart: jest.fn().mockResolvedValue(undefined),
+  loadCart: jest.fn().mockResolvedValue(null),
+  clearCart: jest.fn().mockResolvedValue(undefined),
+}));
+
+// Mock broadcast channel
+jest.mock("../lib/broadcastChannel", () => ({
+  getCartSyncChannel: jest.fn(() => ({
+    subscribe: jest.fn(),
+    broadcastCartUpdate: jest.fn(),
+    broadcastCartClear: jest.fn(),
+  })),
+}));
+
 describe("Cart Store", () => {
   beforeEach(() => {
     // Reset cart before each test
@@ -218,6 +234,64 @@ describe("Cart Store", () => {
 
       const items = useCartStore.getState().items;
       expect(items).toHaveLength(0);
+    });
+  });
+
+  describe("Promo Code Management", () => {
+    it("should apply a single promo code", () => {
+      const store = useCartStore.getState();
+
+      store.applyPromoCode("WELCOME10");
+
+      const promoCodes = useCartStore.getState().promoCodes;
+      expect(promoCodes).toContain("WELCOME10");
+    });
+
+    it("should apply multiple promo codes", () => {
+      const store = useCartStore.getState();
+
+      store.applyPromoCode("WELCOME10");
+      store.applyPromoCode("SAVE25");
+
+      const promoCodes = useCartStore.getState().promoCodes;
+      expect(promoCodes).toContain("WELCOME10");
+      expect(promoCodes).toContain("SAVE25");
+      expect(promoCodes).toHaveLength(2);
+    });
+
+    it("should not add duplicate promo codes", () => {
+      const store = useCartStore.getState();
+
+      store.applyPromoCode("WELCOME10");
+      store.applyPromoCode("WELCOME10"); // Try to add duplicate
+
+      const promoCodes = useCartStore.getState().promoCodes;
+      expect(promoCodes).toHaveLength(1);
+      expect(promoCodes).toContain("WELCOME10");
+    });
+
+    it("should remove a specific promo code", () => {
+      const store = useCartStore.getState();
+
+      store.applyPromoCode("WELCOME10");
+      store.applyPromoCode("SAVE25");
+      store.removePromoCode("WELCOME10");
+
+      const promoCodes = useCartStore.getState().promoCodes;
+      expect(promoCodes).not.toContain("WELCOME10");
+      expect(promoCodes).toContain("SAVE25");
+      expect(promoCodes).toHaveLength(1);
+    });
+
+    it("should clear all promo codes", () => {
+      const store = useCartStore.getState();
+
+      store.applyPromoCode("WELCOME10");
+      store.applyPromoCode("SAVE25");
+      store.clearPromoCodes();
+
+      const promoCodes = useCartStore.getState().promoCodes;
+      expect(promoCodes).toHaveLength(0);
     });
   });
 });
