@@ -6,7 +6,7 @@ import {
   promoCodeInputSchema,
   quantityInputSchema,
   validateFormInput,
-  type ValidationError
+  type ValidationError,
 } from "./schemas";
 import { z } from "zod";
 
@@ -233,7 +233,7 @@ export function validateSelectedVariants(selectedVariants: unknown): {
   }
   return {
     success: false,
-    errors: [{ field: 'selectedVariants', message: result.message }]
+    errors: [{ field: "selectedVariants", message: result.message }],
   };
 }
 
@@ -251,7 +251,7 @@ export function validateProductConfiguration(config: unknown): {
   }
   return {
     success: false,
-    errors: [{ field: 'configuration', message: result.message }]
+    errors: [{ field: "configuration", message: result.message }],
   };
 }
 

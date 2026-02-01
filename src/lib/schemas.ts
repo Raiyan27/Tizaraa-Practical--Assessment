@@ -6,7 +6,10 @@ export const variantSchema = z.object({
   name: z.string().min(1, "Variant name is required"),
   priceModifier: z.number().min(0, "Price modifier must be non-negative"),
   stock: z.number().int().min(0, "Stock must be non-negative"),
-  hex: z.string().regex(/^#[0-9A-F]{6}$/i, "Invalid hex color").optional(),
+  hex: z
+    .string()
+    .regex(/^#[0-9A-F]{6}$/i, "Invalid hex color")
+    .optional(),
   incompatibleWith: z.array(z.string()).optional(),
 });
 
@@ -30,7 +33,9 @@ export const productSchema = z.object({
   brand: z.string().optional(),
   origin: z.string().optional(),
   createdAt: z.string().optional(),
-  geometryType: z.enum(["box", "cylinder", "sphere", "torus", "lathe", "combined"]).optional(),
+  geometryType: z
+    .enum(["box", "cylinder", "sphere", "torus", "lathe", "combined"])
+    .optional(),
 });
 
 export const selectedVariantsSchema = z.object({
@@ -56,11 +61,14 @@ export const cartItemSchema = z.object({
   addedAt: z.string().datetime("Invalid timestamp"),
 });
 
-export const savedItemSchema = cartItemSchema.extend({
-  savedAt: z.string().datetime("Invalid timestamp"),
-}).omit({ id: true }).extend({
-  id: z.string().min(1, "Saved item ID is required"),
-});
+export const savedItemSchema = cartItemSchema
+  .extend({
+    savedAt: z.string().datetime("Invalid timestamp"),
+  })
+  .omit({ id: true })
+  .extend({
+    id: z.string().min(1, "Saved item ID is required"),
+  });
 
 export const cartSchema = z.object({
   items: z.array(cartItemSchema),
@@ -75,21 +83,26 @@ export const promoCodeSchema = z.object({
   code: z.string().min(1, "Promo code is required").toUpperCase(),
   discountType: z.enum(["percentage", "fixed"]),
   discountValue: z.number().positive("Discount value must be positive"),
-  minPurchase: z.number().positive("Minimum purchase must be positive").optional(),
+  minPurchase: z
+    .number()
+    .positive("Minimum purchase must be positive")
+    .optional(),
   validUntil: z.string().datetime("Invalid date format"),
   description: z.string().optional(),
 });
 
 // Form validation schemas
 export const promoCodeInputSchema = z.object({
-  code: z.string()
+  code: z
+    .string()
     .min(1, "Please enter a promo code")
     .max(20, "Promo code is too long")
     .regex(/^[A-Z0-9_-]+$/i, "Promo code contains invalid characters"),
 });
 
 export const quantityInputSchema = z.object({
-  quantity: z.number()
+  quantity: z
+    .number()
     .int("Quantity must be a whole number")
     .min(1, "Quantity must be at least 1")
     .max(99, "Quantity cannot exceed 99"),
@@ -101,49 +114,58 @@ export type ValidationError = {
   message: string;
 };
 
-export type ValidationResult<T> = {
-  success: true;
-  data: T;
-} | {
-  success: false;
-  errors: ValidationError[];
-};
+export type ValidationResult<T> =
+  | {
+      success: true;
+      data: T;
+    }
+  | {
+      success: false;
+      errors: ValidationError[];
+    };
 
 // Utility functions for validation
 export function validateData<T>(
   schema: z.ZodSchema<T>,
   data: unknown,
-  fieldPrefix = ""
+  fieldPrefix = "",
 ): ValidationResult<T> {
   try {
     const result = schema.parse(data);
     return { success: true, data: result };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors: ValidationError[] = error.issues.map(err => ({
-        field: fieldPrefix ? `${fieldPrefix}.${err.path.join('.')}` : err.path.join('.'),
+      const errors: ValidationError[] = error.issues.map((err) => ({
+        field: fieldPrefix
+          ? `${fieldPrefix}.${err.path.join(".")}`
+          : err.path.join("."),
         message: err.message,
       }));
       return { success: false, errors };
     }
     return {
       success: false,
-      errors: [{ field: fieldPrefix || 'unknown', message: 'Validation failed' }]
+      errors: [
+        { field: fieldPrefix || "unknown", message: "Validation failed" },
+      ],
     };
   }
 }
 
 export function validateFormInput<T>(
   schema: z.ZodSchema<T>,
-  data: unknown
+  data: unknown,
 ): { success: true; data: T } | { success: false; message: string } {
   try {
     const result = schema.parse(data);
     return { success: true, data: result };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, message: error.issues[0]?.message || 'Invalid input' };
+      return {
+        success: false,
+        message: error.issues[0]?.message || "Invalid input",
+      };
     }
-    return { success: false, message: 'Validation failed' };
+    return { success: false, message: "Validation failed" };
   }
 }
