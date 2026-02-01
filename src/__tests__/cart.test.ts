@@ -1,6 +1,4 @@
 import { useCartStore } from "../store/cartStore";
-import { CartItem } from "../types/cart";
-import { getProductById } from "../data/products";
 
 describe("Cart Store", () => {
   beforeEach(() => {

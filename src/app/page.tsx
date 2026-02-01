@@ -6,6 +6,7 @@ import { products } from "@/data/products";
 import { useCartStore } from "@/store/cartStore";
 import { PriceDisplay } from "@/components/ui/PriceDisplay";
 import { Badge } from "@/components/ui/Badge";
+import { StaticProductPreview } from "@/components/cart/StaticProductPreview";
 
 export default function Home() {
   const { items, loadCartFromStorage } = useCartStore();
@@ -92,21 +93,18 @@ export default function Home() {
               href={`/product/${product.id}`}
               className="group bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all transform hover:-translate-y-1"
             >
-              {/* Product Image Placeholder */}
-              <div className="h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all"></div>
-                <div className="text-center z-10">
-                  <div className="text-6xl mb-4">
-                    {product.geometryType === "box" && "🪑"}
-                    {product.geometryType === "cylinder" && "💡"}
-                    {product.geometryType === "lathe" && "🏺"}
-                    {product.geometryType === "torus" && "⭕"}
-                    {product.geometryType === "combined" && "🎨"}
-                  </div>
-                  <div className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-medium inline-block">
-                    View in 3D →
-                  </div>
-                </div>
+              {/* Product 3D Preview */}
+              <div className="h-64 bg-linear-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-linear-to-br from-blue-500/10 to-purple-500/10 group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all"></div>
+                <StaticProductPreview
+                  product={product}
+                  selectedVariants={{
+                    color: product.variants.colors[0].id,
+                    material: product.variants.materials[0].id,
+                    size: product.variants.sizes[0].id,
+                  }}
+                  size={150}
+                />
               </div>
 
               {/* Product Info */}

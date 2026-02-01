@@ -20,14 +20,48 @@ export function SculptureModel({
   useFrame((state) => {
     if (groupRef.current) {
       groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.1;
+      groupRef.current.rotation.z =
+        Math.sin(state.clock.getElapsedTime() * 0.05) * 0.15;
     }
   });
 
   return (
     <group ref={groupRef}>
-      {/* Central sphere */}
+      {/* Central vertical cylinder */}
+      <mesh castShadow>
+        <cylinderGeometry args={[0.25, 0.25, 2, 16]} />
+        <meshStandardMaterial
+          color={color}
+          roughness={roughness}
+          metalness={metalness}
+        />
+      </mesh>
+
+      {/* Intersecting cube rotated */}
+      <mesh rotation={[0.4, 0.5, 0.3]} castShadow>
+        <boxGeometry args={[0.8, 0.8, 0.8]} />
+        <meshStandardMaterial
+          color={color}
+          roughness={roughness * 0.8}
+          metalness={metalness * 1.1}
+          transparent={true}
+          opacity={0.8}
+        />
+      </mesh>
+
+      {/* Ring around middle */}
       <mesh position={[0, 0, 0]} castShadow>
-        <sphereGeometry args={[0.8, 32, 32]} />
+        <torusGeometry args={[0.9, 0.12, 16, 32]} />
+        <meshStandardMaterial
+          color={color}
+          roughness={roughness * 0.6}
+          metalness={metalness}
+        />
+      </mesh>
+
+      {/* Side extending arm */}
+      <mesh position={[1, 0.3, 0]} rotation={[0, 0, 0.2]} castShadow>
+        <boxGeometry args={[1.2, 0.2, 0.2]} />
         <meshStandardMaterial
           color={color}
           roughness={roughness}
@@ -35,51 +69,9 @@ export function SculptureModel({
         />
       </mesh>
 
-      {/* Orbiting cubes */}
-      <mesh position={[1.5, 0.5, 0]} castShadow>
-        <boxGeometry args={[0.4, 0.4, 0.4]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-
-      <mesh position={[-1.5, -0.5, 0]} castShadow>
-        <boxGeometry args={[0.5, 0.5, 0.5]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-
-      {/* Torus ring around */}
-      <mesh
-        position={[0, 0, 0]}
-        rotation={[Math.PI / 4, 0, Math.PI / 4]}
-        castShadow
-      >
-        <torusGeometry args={[1.2, 0.15, 16, 32]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-
-      {/* Small cylinders */}
-      <mesh position={[0, 1.2, 0]} castShadow>
-        <cylinderGeometry args={[0.2, 0.2, 0.8, 16]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-
-      <mesh position={[0, -1.2, 0]} castShadow>
-        <cylinderGeometry args={[0.2, 0.2, 0.8, 16]} />
+      {/* Opposite arm */}
+      <mesh position={[-1, -0.3, 0]} rotation={[0, 0, -0.2]} castShadow>
+        <boxGeometry args={[1.2, 0.2, 0.2]} />
         <meshStandardMaterial
           color={color}
           roughness={roughness}

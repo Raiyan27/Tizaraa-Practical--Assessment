@@ -13,7 +13,7 @@ export function Scene({ children }: SceneProps) {
     <Canvas
       camera={{ position: [0, 2, 5], fov: 50 }}
       shadows
-      className="bg-gradient-to-br from-gray-50 to-gray-100"
+      className="bg-linear-to-br from-gray-50 to-gray-100"
     >
       <Suspense fallback={null}>
         {/* Lighting */}
@@ -45,7 +45,7 @@ export function Scene({ children }: SceneProps) {
         <OrbitControls
           enableZoom={true}
           enablePan={false}
-          minPolarAngle={Math.PI / 4}
+          minPolarAngle={Math.PI / 100}
           maxPolarAngle={Math.PI / 1.5}
           minDistance={3}
           maxDistance={8}

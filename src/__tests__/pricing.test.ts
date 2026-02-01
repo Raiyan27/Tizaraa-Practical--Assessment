@@ -1,6 +1,5 @@
 import {
   calculateProductPrice,
-  calculateBundleDiscount,
   calculatePromoDiscount,
   calculateCartSummary,
 } from "../lib/pricing";
@@ -209,7 +208,7 @@ describe("Pricing Engine", () => {
 
       const summary = calculateCartSummary(
         cartItems,
-        promoCode,
+        promoCode.code,
         mockProductGetter,
       );
 

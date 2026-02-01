@@ -1,173 +1,29 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useRef, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Environment } from "@react-three/drei";
 import { Product, SelectedVariants } from "@/types/product";
 import { getVariantById } from "@/data/products";
+import { ChairModel } from "@/components/3d/models/ChairModel";
+import { LampModel } from "@/components/3d/models/LampModel";
+import { VaseModel } from "@/components/3d/models/VaseModel";
+import { RingModel } from "@/components/3d/models/RingModel";
+import { SculptureModel } from "@/components/3d/models/SculptureModel";
+import { Group } from "three";
 
-// Static model components - no animation
-function ChairModelStatic({
-  color,
-  roughness,
-  metalness,
-}: {
-  color: string;
-  roughness: number;
-  metalness: number;
-}) {
-  return (
-    <group scale={0.6}>
-      <mesh position={[0, 0.15, 0]}>
-        <boxGeometry args={[0.8, 0.1, 0.8]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-      <mesh position={[0, 0.55, -0.35]}>
-        <boxGeometry args={[0.8, 0.7, 0.1]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-      {[
-        [-0.3, -0.25, -0.3],
-        [0.3, -0.25, -0.3],
-        [-0.3, -0.25, 0.3],
-        [0.3, -0.25, 0.3],
-      ].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]}>
-          <boxGeometry args={[0.08, 0.5, 0.08]} />
-          <meshStandardMaterial
-            color={color}
-            roughness={roughness}
-            metalness={metalness}
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-}
+// Wrapper to disable animations in the actual models
+function StaticModelWrapper({ children }: { children: React.ReactElement }) {
+  const groupRef = useRef<Group>(null);
 
-function LampModelStatic({
-  color,
-  roughness,
-  metalness,
-}: {
-  color: string;
-  roughness: number;
-  metalness: number;
-}) {
-  return (
-    <group scale={0.5}>
-      <mesh position={[0, -0.4, 0]}>
-        <cylinderGeometry args={[0.3, 0.35, 0.08, 32]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-      <mesh position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.03, 0.03, 0.8, 16]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-      <mesh position={[0, 0.35, 0]}>
-        <coneGeometry args={[0.35, 0.4, 32, 1, true]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-          side={2}
-        />
-      </mesh>
-    </group>
-  );
-}
+  // Reset any rotation that might be applied by animations
+  useEffect(() => {
+    if (groupRef.current) {
+      groupRef.current.rotation.set(0, 0, 0);
+    }
+  });
 
-function VaseModelStatic({
-  color,
-  roughness,
-  metalness,
-}: {
-  color: string;
-  roughness: number;
-  metalness: number;
-}) {
-  return (
-    <group scale={0.6}>
-      <mesh position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.2, 0.3, 0.8, 32]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-function RingModelStatic({
-  color,
-  roughness,
-  metalness,
-}: {
-  color: string;
-  roughness: number;
-  metalness: number;
-}) {
-  return (
-    <group scale={0.8} rotation={[Math.PI / 4, 0, 0]}>
-      <mesh>
-        <torusGeometry args={[0.35, 0.08, 32, 64]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-function SculptureModelStatic({
-  color,
-  roughness,
-  metalness,
-}: {
-  color: string;
-  roughness: number;
-  metalness: number;
-}) {
-  return (
-    <group scale={0.4}>
-      <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[0.4, 32, 32]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-      <mesh position={[0, 0.5, 0]}>
-        <boxGeometry args={[0.3, 0.3, 0.3]} />
-        <meshStandardMaterial
-          color={color}
-          roughness={roughness}
-          metalness={metalness}
-        />
-      </mesh>
-    </group>
-  );
+  return <group ref={groupRef}>{children}</group>;
 }
 
 interface StaticProductPreviewProps {
@@ -222,30 +78,54 @@ export function StaticProductPreview({
 
     switch (product.geometryType) {
       case "box":
-        return <ChairModelStatic {...props} />;
+        return (
+          <StaticModelWrapper>
+            <ChairModel {...props} />
+          </StaticModelWrapper>
+        );
       case "cylinder":
-        return <LampModelStatic {...props} />;
+        return (
+          <StaticModelWrapper>
+            <LampModel {...props} />
+          </StaticModelWrapper>
+        );
       case "lathe":
-        return <VaseModelStatic {...props} />;
+        return (
+          <StaticModelWrapper>
+            <VaseModel {...props} />
+          </StaticModelWrapper>
+        );
       case "torus":
-        return <RingModelStatic {...props} />;
+        return (
+          <StaticModelWrapper>
+            <RingModel {...props} />
+          </StaticModelWrapper>
+        );
       case "combined":
-        return <SculptureModelStatic {...props} />;
+        return (
+          <StaticModelWrapper>
+            <SculptureModel {...props} />
+          </StaticModelWrapper>
+        );
       default:
-        return <ChairModelStatic {...props} />;
+        return (
+          <StaticModelWrapper>
+            <ChairModel {...props} />
+          </StaticModelWrapper>
+        );
     }
   };
 
   return (
     <div
       className="rounded-lg overflow-hidden bg-linear-to-br from-gray-100 to-gray-200"
-      style={{ width: size, height: size }}
+      style={{ width: size + 100, height: size + 100 }}
     >
       <Canvas
-        camera={{ position: [2, 1.5, 2], fov: 35 }}
+        camera={{ position: [3.5, 1, 2], fov: 45 }}
         gl={{ preserveDrawingBuffer: true, antialias: true }}
         frameloop="demand"
-        style={{ width: size, height: size }}
+        style={{ width: size + 100, height: size + 100 }}
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={0.8} />
