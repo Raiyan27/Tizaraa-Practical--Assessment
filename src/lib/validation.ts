@@ -1,13 +1,20 @@
 import { Product, SelectedVariants } from "@/types/product";
 import { getVariantById } from "@/data/products";
+import {
+  selectedVariantsSchema,
+  productConfigurationSchema,
+  promoCodeInputSchema,
+  quantityInputSchema,
+  validateFormInput,
+  type ValidationError
+} from "./schemas";
+import { z } from "zod";
 
-export interface ValidationError {
-  field: "color" | "material" | "size";
-  message: string;
-}
+export { type ValidationError };
 
 /**
  * Validates if selected variant combination is compatible
+ * This is business logic validation, not Zod schema validation
  */
 export function validateVariantCombination(
   product: Product,
@@ -208,4 +215,72 @@ export function isVariantIncompatible(
   }
 
   return false;
+}
+
+// Zod-based validation functions
+
+/**
+ * Validates selected variants using Zod schema
+ */
+export function validateSelectedVariants(selectedVariants: unknown): {
+  success: boolean;
+  data?: SelectedVariants;
+  errors?: ValidationError[];
+} {
+  const result = validateFormInput(selectedVariantsSchema, selectedVariants);
+  if (result.success) {
+    return { success: true, data: result.data };
+  }
+  return {
+    success: false,
+    errors: [{ field: 'selectedVariants', message: result.message }]
+  };
+}
+
+/**
+ * Validates product configuration using Zod schema
+ */
+export function validateProductConfiguration(config: unknown): {
+  success: boolean;
+  data?: z.infer<typeof productConfigurationSchema>;
+  errors?: ValidationError[];
+} {
+  const result = validateFormInput(productConfigurationSchema, config);
+  if (result.success) {
+    return { success: true, data: result.data };
+  }
+  return {
+    success: false,
+    errors: [{ field: 'configuration', message: result.message }]
+  };
+}
+
+/**
+ * Validates promo code input using Zod schema
+ */
+export function validatePromoCodeInput(code: string): {
+  success: boolean;
+  data?: string;
+  message?: string;
+} {
+  const result = validateFormInput(promoCodeInputSchema, { code });
+  if (result.success) {
+    return { success: true, data: result.data.code };
+  }
+  return { success: false, message: result.message };
+}
+
+/**
+ * Validates quantity input using Zod schema
+ */
+export function validateQuantityInput(quantity: number): {
+  success: boolean;
+  data?: number;
+  message?: string;
+} {
+  const result = validateFormInput(quantityInputSchema, { quantity });
+  if (result.success) {
+    return { success: true, data: result.data.quantity };
+  }
+  return { success: false, message: result.message };
 }

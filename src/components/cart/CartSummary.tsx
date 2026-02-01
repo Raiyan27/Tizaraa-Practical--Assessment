@@ -6,6 +6,7 @@ import { PriceDisplay } from "@/components/ui/PriceDisplay";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { validatePromoCodeInput } from "@/lib/validation";
 
 interface CartSummaryProps {
   summary: PriceBreakdown;
@@ -28,19 +29,23 @@ export const CartSummary = memo(function CartSummary({
   const [promoError, setPromoError] = useState("");
 
   const handleApplyPromo = useCallback(() => {
-    if (!promoInput.trim()) {
-      setPromoError("Please enter a promo code");
+    // Validate input format using Zod
+    const validation = validatePromoCodeInput(promoInput);
+    if (!validation.success) {
+      setPromoError(validation.message || "Invalid promo code format");
       return;
     }
 
+    const code = validation.data!;
+
     // Check if code is already applied
-    if (promoCodes.includes(promoInput.toUpperCase())) {
+    if (promoCodes.includes(code)) {
       setPromoError("This code is already applied");
       return;
     }
 
     try {
-      onApplyPromo(promoInput.toUpperCase());
+      onApplyPromo(code);
       setPromoInput(""); // Clear input after successful application
       setPromoError("");
     } catch (error) {
