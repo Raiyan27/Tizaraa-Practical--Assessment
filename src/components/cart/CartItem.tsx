@@ -50,8 +50,8 @@ export function CartItem({
   );
 
   return (
-    <div className="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-200">
-      <div className="flex gap-3 sm:gap-4">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+      <div className="p-3 sm:p-4 flex gap-3 sm:gap-4 flex-1">
         {/* Static 3D Preview */}
         <div className="shrink-0">
           <StaticProductPreview
@@ -62,68 +62,66 @@ export function CartItem({
         </div>
 
         {/* Product Details */}
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-2">
-            <div className="min-w-0">
-              <Link
-                href={`/product/${item.productId}`}
-                className="text-base sm:text-lg font-semibold text-gray-900 hover:text-blue-600 line-clamp-2"
-              >
-                {product.name}
-              </Link>
-              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-1 sm:gap-2 mt-1 text-xs sm:text-sm text-gray-600">
-                <span>Color: {colorVariant?.name}</span>
-                <span className="hidden sm:inline">•</span>
-                <span>Material: {materialVariant?.name}</span>
-                <span className="hidden sm:inline">•</span>
-                <span>Size: {sizeVariant?.name}</span>
+        <div className="flex-1 min-w-0 flex flex-col">
+          {/* Name and Specs */}
+          <div className="mb-2">
+            <Link
+              href={`/product/${item.productId}`}
+              className="text-sm sm:text-base font-semibold text-gray-900 hover:text-blue-600 line-clamp-2"
+            >
+              {product.name}
+            </Link>
+            <div className="flex flex-col gap-1 mt-1 text-xs text-gray-600">
+              <span>Color: {colorVariant?.name}</span>
+              <span>Material: {materialVariant?.name}</span>
+              <span>Size: {sizeVariant?.name}</span>
+            </div>
+          </div>
+
+          {/* Price */}
+          <div className="mb-2">
+            <div className="font-bold text-sm sm:text-base text-gray-900">
+              <PriceDisplay amount={price} />
+            </div>
+            {item.quantity > 1 && (
+              <div className="text-xs text-gray-500">
+                <PriceDisplay amount={price / item.quantity} /> each
               </div>
-            </div>
-            <div className="text-right shrink-0">
-              <PriceDisplay
-                amount={price}
-                className="text-base sm:text-lg font-bold"
-              />
-              {item.quantity > 1 && (
-                <div className="text-xs sm:text-sm text-gray-500">
-                  <PriceDisplay amount={price / item.quantity} /> each
-                </div>
-              )}
-            </div>
+            )}
           </div>
 
           {/* Stock Warning */}
           {isLowStock && (
-            <div className="mb-2">
+            <div>
               <StockBadge stock={availableStock} />
             </div>
           )}
+        </div>
+      </div>
 
-          {/* Quantity & Actions */}
-          <div className="flex flex-row items-center justify-between gap-2 sm:gap-3">
-            <QuantitySelector
-              value={item.quantity}
-              onChange={onUpdateQuantity}
-              min={1}
-              max={availableStock}
-            />
+      {/* Fixed Action Bar at Bottom */}
+      <div className="px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between gap-2 sm:gap-3 flex-shrink-0">
+        <QuantitySelector
+          value={item.quantity}
+          onChange={onUpdateQuantity}
+          min={1}
+          max={availableStock}
+        />
 
-            <div className="flex gap-2 text-xs sm:text-sm">
-              <button
-                onClick={onSaveForLater}
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                Save
-              </button>
-              <span className="text-gray-300">|</span>
-              <button
-                onClick={onRemove}
-                className="text-red-600 hover:text-red-700 font-medium"
-              >
-                Remove
-              </button>
-            </div>
-          </div>
+        <div className="flex gap-2 sm:gap-3 text-xs sm:text-sm shrink-0 whitespace-nowrap">
+          <button
+            onClick={onSaveForLater}
+            className="text-blue-600 hover:text-blue-700 font-medium active:text-blue-800"
+          >
+            Save for later
+          </button>
+          <span className="text-gray-300">|</span>
+          <button
+            onClick={onRemove}
+            className="text-red-600 hover:text-red-700 font-medium active:text-red-800"
+          >
+            Remove
+          </button>
         </div>
       </div>
     </div>

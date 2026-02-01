@@ -9,7 +9,8 @@ import { getProductById } from "@/data/products";
 interface CartState {
   items: CartItem[];
   savedItems: SavedItem[];
-  promoCode?: string;
+  promoCode?: string; // Deprecated - kept for backwards compatibility
+  promoCodes: string[]; // New: support multiple promo codes
   isLoading: boolean;
   isInitialized: boolean;
 
@@ -28,9 +29,10 @@ interface CartState {
   moveToCart: (savedItemId: string) => Promise<void>;
   removeSavedItem: (savedItemId: string) => Promise<void>;
 
-  // Promo code
+  // Promo codes (updated for multiple codes)
   applyPromoCode: (code: string) => void;
-  removePromoCode: () => void;
+  removePromoCode: (code: string) => void;
+  clearPromoCodes: () => void;
 
   // Persistence
   loadCartFromStorage: () => Promise<void>;
@@ -45,7 +47,12 @@ export const useCartStore = create<CartState>((set, get) => {
       if (message.type === "CART_UPDATED") {
         get().syncFromOtherTab();
       } else if (message.type === "CART_CLEARED") {
-        set({ items: [], savedItems: [], promoCode: undefined });
+        set({
+          items: [],
+          savedItems: [],
+          promoCode: undefined,
+          promoCodes: [],
+        });
       }
     });
   }
@@ -53,7 +60,8 @@ export const useCartStore = create<CartState>((set, get) => {
   return {
     items: [],
     savedItems: [],
-    promoCode: undefined,
+    promoCode: undefined, // Deprecated
+    promoCodes: [],
     isLoading: false,
     isInitialized: false,
 
@@ -119,6 +127,7 @@ export const useCartStore = create<CartState>((set, get) => {
           items: newItems,
           savedItems: get().savedItems,
           promoCode: get().promoCode,
+          promoCodes: get().promoCodes,
           lastUpdated: new Date().toISOString(),
         };
 
@@ -169,6 +178,7 @@ export const useCartStore = create<CartState>((set, get) => {
           items: newItems,
           savedItems: get().savedItems,
           promoCode: get().promoCode,
+          promoCodes: get().promoCodes,
           lastUpdated: new Date().toISOString(),
         };
 
@@ -195,6 +205,7 @@ export const useCartStore = create<CartState>((set, get) => {
           items: newItems,
           savedItems: get().savedItems,
           promoCode: get().promoCode,
+          promoCodes: get().promoCodes,
           lastUpdated: new Date().toISOString(),
         };
 
@@ -212,7 +223,12 @@ export const useCartStore = create<CartState>((set, get) => {
 
       try {
         await clearCartDB();
-        set({ items: [], promoCode: undefined });
+        set({
+          items: [],
+          savedItems: [],
+          promoCode: undefined,
+          promoCodes: [],
+        });
 
         getCartSyncChannel().broadcastCartClear();
       } finally {
@@ -247,6 +263,7 @@ export const useCartStore = create<CartState>((set, get) => {
           items: newItems,
           savedItems: newSavedItems,
           promoCode: get().promoCode,
+          promoCodes: get().promoCodes,
           lastUpdated: new Date().toISOString(),
         };
 
@@ -321,6 +338,7 @@ export const useCartStore = create<CartState>((set, get) => {
           items: get().items,
           savedItems: newSavedItems,
           promoCode: get().promoCode,
+          promoCodes: get().promoCodes,
           lastUpdated: new Date().toISOString(),
         };
 
@@ -334,11 +352,27 @@ export const useCartStore = create<CartState>((set, get) => {
     },
 
     applyPromoCode: (code: string) => {
-      set({ promoCode: code });
+      const currentCodes = get().promoCodes;
+      // Prevent adding duplicate codes
+      if (!currentCodes.includes(code.toUpperCase())) {
+        set({
+          promoCodes: [...currentCodes, code.toUpperCase()],
+          promoCode: code, // Keep for backwards compatibility
+        });
+      }
     },
 
-    removePromoCode: () => {
-      set({ promoCode: undefined });
+    removePromoCode: (code: string) => {
+      const currentCodes = get().promoCodes;
+      const newCodes = currentCodes.filter((c) => c !== code.toUpperCase());
+      set({
+        promoCodes: newCodes,
+        promoCode: newCodes[0], // Keep first code for backwards compatibility
+      });
+    },
+
+    clearPromoCodes: () => {
+      set({ promoCodes: [], promoCode: undefined });
     },
 
     loadCartFromStorage: async () => {
@@ -352,7 +386,9 @@ export const useCartStore = create<CartState>((set, get) => {
           set({
             items: cart.items || [],
             savedItems: cart.savedItems || [],
-            promoCode: cart.promoCode,
+            promoCodes:
+              cart.promoCodes || (cart.promoCode ? [cart.promoCode] : []),
+            promoCode: cart.promoCode, // Backwards compatibility
             isInitialized: true,
           });
         } else {
@@ -373,6 +409,8 @@ export const useCartStore = create<CartState>((set, get) => {
           set({
             items: cart.items || [],
             savedItems: cart.savedItems || [],
+            promoCodes:
+              cart.promoCodes || (cart.promoCode ? [cart.promoCode] : []),
             promoCode: cart.promoCode,
           });
         }

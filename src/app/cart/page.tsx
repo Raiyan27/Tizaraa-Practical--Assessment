@@ -15,7 +15,7 @@ export default function CartPage() {
   const {
     items,
     savedItems,
-    promoCode,
+    promoCodes,
     isLoading,
     isInitialized,
     updateQuantity,
@@ -45,8 +45,8 @@ export default function CartPage() {
     alert("Checkout functionality coming soon!");
   };
 
-  // Calculate cart summary
-  const summary = calculateCartSummary(items, promoCode);
+  // Calculate cart summary with multiple promo codes
+  const summary = calculateCartSummary(items, promoCodes);
 
   if (!isInitialized || isLoading) {
     return (
@@ -153,6 +153,7 @@ export default function CartPage() {
                       <SavedItem
                         key={item.id}
                         item={item}
+                        cartItems={items}
                         onMoveToCart={() => moveToCart(item.id)}
                         onRemove={() => removeSavedItem(item.id)}
                       />
@@ -167,7 +168,7 @@ export default function CartPage() {
               <div className="lg:col-span-1">
                 <CartSummary
                   summary={summary}
-                  promoCode={promoCode}
+                  promoCodes={promoCodes}
                   onApplyPromo={handleApplyPromo}
                   onRemovePromo={removePromoCode}
                   onCheckout={handleCheckout}

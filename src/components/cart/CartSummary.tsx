@@ -9,15 +9,15 @@ import { Badge } from "@/components/ui/Badge";
 
 interface CartSummaryProps {
   summary: PriceBreakdown;
-  promoCode?: string;
+  promoCodes?: string[];
   onApplyPromo: (code: string) => void;
-  onRemovePromo: () => void;
+  onRemovePromo: (code: string) => void;
   onCheckout: () => void;
 }
 
 export function CartSummary({
   summary,
-  promoCode,
+  promoCodes = [],
   onApplyPromo,
   onRemovePromo,
   onCheckout,
@@ -31,8 +31,15 @@ export function CartSummary({
       return;
     }
 
+    // Check if code is already applied
+    if (promoCodes.includes(promoInput.toUpperCase())) {
+      setPromoError("This code is already applied");
+      return;
+    }
+
     try {
       onApplyPromo(promoInput.toUpperCase());
+      setPromoInput(""); // Clear input after successful application
       setPromoError("");
     } catch (error) {
       setPromoError(
@@ -104,40 +111,56 @@ export function CartSummary({
 
       {/* Promo Code */}
       <div className="mb-4 sm:mb-6">
-        {promoCode ? (
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center gap-2">
-              <Badge variant="success">{promoCode}</Badge>
-              <span className="text-xs sm:text-sm text-gray-600">Applied</span>
-            </div>
-            <button
-              onClick={onRemovePromo}
-              className="text-sm text-red-600 hover:text-red-700 text-left sm:text-right"
-            >
-              Remove
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Input
-                value={promoInput}
-                onChange={(e) => {
-                  setPromoInput(e.target.value);
-                  setPromoError("");
-                }}
-                placeholder="Enter promo code"
-                className="flex-1 text-sm"
-              />
-              <Button onClick={handleApplyPromo} variant="secondary" size="sm">
-                Apply
-              </Button>
-            </div>
-            {promoError && (
-              <p className="text-xs sm:text-sm text-red-600">{promoError}</p>
-            )}
+        {/* Display applied promo codes */}
+        {promoCodes.length > 0 && (
+          <div className="mb-3 space-y-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-700">
+              Applied Promo Codes:
+            </p>
+            {promoCodes.map((code) => (
+              <div
+                key={code}
+                className="flex items-center justify-between p-2 sm:p-3 bg-green-50 border border-green-200 rounded-lg"
+              >
+                <div className="flex items-center gap-2">
+                  <Badge variant="success">{code}</Badge>
+                </div>
+                <button
+                  onClick={() => onRemovePromo(code)}
+                  className="text-xs sm:text-sm text-red-600 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
           </div>
         )}
+
+        {/* Input for new promo code */}
+        <div className="space-y-2">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Input
+              value={promoInput}
+              onChange={(e) => {
+                setPromoInput(e.target.value);
+                setPromoError("");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleApplyPromo();
+                }
+              }}
+              placeholder="Enter promo code"
+              className="flex-1 text-sm"
+            />
+            <Button onClick={handleApplyPromo} variant="secondary" size="sm">
+              Apply
+            </Button>
+          </div>
+          {promoError && (
+            <p className="text-xs sm:text-sm text-red-600">{promoError}</p>
+          )}
+        </div>
       </div>
 
       {/* Checkout Button */}
@@ -148,8 +171,13 @@ export function CartSummary({
       {/* Free Shipping Notice */}
       {summary.shipping > 0 && summary.subtotal < 75 && (
         <p className="text-xs sm:text-sm text-center text-gray-600">
-          Add <PriceDisplay amount={75 - summary.subtotal} /> more for FREE
-          shipping
+          Add <PriceDisplay amount={75 - summary.subtotal} /> more to unlock
+          free shipping (use code FREESHIP)
+        </p>
+      )}
+      {summary.shipping > 0 && summary.subtotal >= 75 && (
+        <p className="text-xs sm:text-sm text-center text-gray-600">
+          Use code <strong>FREESHIP</strong> for free shipping
         </p>
       )}
     </div>

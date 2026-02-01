@@ -6,7 +6,7 @@ export const promoCodes: PromoCode[] = [
     discountType: "percentage",
     discountValue: 10,
     minPurchase: 50,
-    validUntil: "2026-12-31T23:59:59.000Z",
+    validUntil: "2080-12-31T23:59:59.000Z",
     description: "10% off your first order over $50",
   },
   {
@@ -14,7 +14,7 @@ export const promoCodes: PromoCode[] = [
     discountType: "fixed",
     discountValue: 25,
     minPurchase: 100,
-    validUntil: "2026-06-30T23:59:59.000Z",
+    validUntil: "2080-12-30T23:59:59.000Z",
     description: "$25 off orders over $100",
   },
   {
@@ -22,7 +22,7 @@ export const promoCodes: PromoCode[] = [
     discountType: "fixed",
     discountValue: 10,
     minPurchase: 75,
-    validUntil: "2026-12-31T23:59:59.000Z",
+    validUntil: "2080-12-31T23:59:59.000Z",
     description: "Free shipping on orders over $75",
   },
 ];

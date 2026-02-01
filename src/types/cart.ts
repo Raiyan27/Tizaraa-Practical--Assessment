@@ -17,7 +17,8 @@ export interface SavedItem extends Omit<CartItem, "id"> {
 export interface Cart {
   items: CartItem[];
   savedItems: SavedItem[];
-  promoCode?: string;
+  promoCode?: string; // Deprecated - kept for backwards compatibility
+  promoCodes?: string[]; // New: support multiple promo codes
   lastUpdated: string;
 }
 

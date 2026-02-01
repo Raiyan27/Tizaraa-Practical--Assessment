@@ -104,7 +104,35 @@ export function calculateBundleDiscount(items: CartItem[]): number {
 }
 
 /**
- * Calculate promo code discount
+ * Calculate promo code discounts for multiple codes
+ */
+export function calculatePromoDiscounts(
+  subtotal: number,
+  promoCodes: PromoCode[],
+): number {
+  if (!promoCodes || promoCodes.length === 0) return 0;
+
+  let totalDiscount = 0;
+  let remainingSubtotal = subtotal;
+
+  // Apply discounts in order, compounding them
+  promoCodes.forEach((promoCode) => {
+    if (promoCode.discountType === "percentage") {
+      const discount = remainingSubtotal * (promoCode.discountValue / 100);
+      totalDiscount += discount;
+      remainingSubtotal -= discount;
+    } else if (promoCode.discountType === "fixed") {
+      const discount = Math.min(promoCode.discountValue, remainingSubtotal);
+      totalDiscount += discount;
+      remainingSubtotal -= discount;
+    }
+  });
+
+  return totalDiscount;
+}
+
+/**
+ * Calculate promo code discount (legacy single code support)
  */
 export function calculatePromoDiscount(
   subtotal: number,
@@ -131,37 +159,54 @@ export function calculateTax(subtotal: number): number {
 }
 
 /**
- * Calculate shipping ($10 flat rate, free over $75 after discounts)
+ * Calculate shipping ($10 flat rate, free only with FREESHIP coupon over $75)
  */
 export function calculateShipping(
   subtotal: number,
-  promoCode?: PromoCode,
+  promoCodes?: PromoCode[],
 ): number {
   const SHIPPING_COST = 10;
   const FREE_SHIPPING_THRESHOLD = 75;
 
-  // Check if promo code provides free shipping
-  if (promoCode?.code === "FREESHIP" && subtotal >= FREE_SHIPPING_THRESHOLD) {
+  // Check if FREESHIP code is in the array
+  const hasFreeShipping = promoCodes?.some(
+    (code) => code.code.toUpperCase() === "FREESHIP",
+  );
+
+  // Only free shipping with FREESHIP promo code on orders over $75
+  if (hasFreeShipping && subtotal >= FREE_SHIPPING_THRESHOLD) {
     return 0;
   }
 
-  return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+  return SHIPPING_COST;
 }
 
 /**
  * Calculate complete cart summary
  * Supports both real products and mock products (for testing)
+ * Supports multiple promo codes
  */
 export function calculateCartSummary(
   items: CartItem[],
-  promoCodeStr?: string,
+  promoCodesStr?: string | string[],
   productGetter: (id: string) => Product | undefined = getProductById,
 ): PriceBreakdown {
-  // Get promo code object if string provided
+  // Get promo code objects
   const { getPromoCodeByCode } = require("@/data/promo-codes");
-  const promoCode: PromoCode | undefined = promoCodeStr
-    ? getPromoCodeByCode(promoCodeStr)
-    : undefined;
+
+  let promoCodes: PromoCode[] = [];
+  if (promoCodesStr) {
+    if (typeof promoCodesStr === "string") {
+      // Single code for backwards compatibility
+      const code = getPromoCodeByCode(promoCodesStr);
+      if (code) promoCodes = [code];
+    } else {
+      // Multiple codes
+      promoCodes = promoCodesStr
+        .map((str) => getPromoCodeByCode(str))
+        .filter((code): code is PromoCode => code !== undefined);
+    }
+  }
 
   // Calculate total item count
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -229,17 +274,17 @@ export function calculateCartSummary(
   const subtotalAfterBundleDiscount =
     subtotalAfterQuantityDiscount - bundleDiscount;
 
-  // Calculate promo discount
-  const promoDiscount = calculatePromoDiscount(
+  // Calculate promo discounts from multiple codes
+  const promoDiscount = calculatePromoDiscounts(
     subtotalAfterBundleDiscount,
-    promoCode,
+    promoCodes,
   );
 
   const subtotalAfterAllDiscounts = subtotalAfterBundleDiscount - promoDiscount;
 
   // Calculate tax and shipping
   const tax = calculateTax(subtotalAfterAllDiscounts);
-  const shipping = calculateShipping(subtotalAfterAllDiscounts, promoCode);
+  const shipping = calculateShipping(subtotalAfterAllDiscounts, promoCodes);
 
   const total = subtotalAfterAllDiscounts + tax + shipping;
 

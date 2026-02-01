@@ -29,7 +29,7 @@ export function StockBadge({
   }
 
   return (
-    <Badge variant="success" className={className}>
+    <Badge variant="success" className={`max-w-16 ${className}`}>
       In Stock
     </Badge>
   );
