@@ -21,6 +21,7 @@ import {
 } from "@/components/filters";
 import { ProductCard } from "@/components/products/ProductCard";
 import { HomeProductGridSkeleton } from "@/components/ui/Skeleton";
+import { MobileBackButton } from "@/components/ui/MobileBackButton";
 
 function ProductsPageContent() {
   const router = useRouter();
@@ -188,12 +189,15 @@ function ProductsPageContent() {
       <header className="bg-white shadow-sm sticky top-0 z-30">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link
-              href="/"
-              className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors"
-            >
-              Tizaraa
-            </Link>
+            <div className="flex items-center gap-3">
+              <MobileBackButton fallbackHref="/" />
+              <Link
+                href="/"
+                className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors"
+              >
+                Tizaraa
+              </Link>
+            </div>
             <Link
               href="/cart"
               className="relative inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

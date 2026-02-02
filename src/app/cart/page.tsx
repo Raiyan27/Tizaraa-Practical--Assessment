@@ -11,6 +11,7 @@ import { CartItem } from "@/components/cart/CartItem";
 import { SavedItem } from "@/components/cart/SavedItem";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { Button } from "@/components/ui/Button";
+import { MobileBackButton } from "@/components/ui/MobileBackButton";
 
 export default function CartPage() {
   const router = useRouter();
@@ -133,16 +134,19 @@ export default function CartPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              Shopping Cart
-            </h1>
-            {hasCartItems && (
-              <p className="text-sm sm:text-base text-gray-600 mt-1">
-                {summary.itemCount} item{summary.itemCount !== 1 ? "s" : ""} in
-                your cart
-              </p>
-            )}
+          <div className="flex items-center gap-3">
+            <MobileBackButton fallbackHref="/products" />
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Shopping Cart
+              </h1>
+              {hasCartItems && (
+                <p className="text-sm sm:text-base text-gray-600 mt-1">
+                  {summary.itemCount} item{summary.itemCount !== 1 ? "s" : ""}{" "}
+                  in your cart
+                </p>
+              )}
+            </div>
           </div>
           <Button
             variant="secondary"

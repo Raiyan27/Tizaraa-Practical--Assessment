@@ -77,7 +77,9 @@ export const RatingFilter = memo(function RatingFilter({
         >
           <div className="flex items-center gap-2">
             {renderStars(rating)}
-            <span className="text-sm text-gray-600">& Up</span>
+            <span className="text-sm text-gray-600">
+              {rating !== 5 ? "& Up" : ""}
+            </span>
           </div>
           <span
             className={`text-xs ${count === 0 ? "text-gray-300" : "text-gray-400"}`}

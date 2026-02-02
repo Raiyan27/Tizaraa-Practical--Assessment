@@ -2,7 +2,7 @@
 
 import { Suspense, useRef, useEffect, memo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
+import { Environment, useProgress } from "@react-three/drei";
 import { Product, SelectedVariants } from "@/types/product";
 import { getVariantById } from "@/data/products";
 import { ChairModel } from "@/components/3d/models/ChairModel";
@@ -11,6 +11,7 @@ import { VaseModel } from "@/components/3d/models/VaseModel";
 import { RingModel } from "@/components/3d/models/RingModel";
 import { SculptureModel } from "@/components/3d/models/SculptureModel";
 import { Group } from "three";
+import { Spinner } from "@/components/ui/Skeleton";
 
 // Wrapper to disable animations in the actual models
 function StaticModelWrapper({ children }: { children: React.ReactElement }) {
@@ -37,6 +38,7 @@ export const StaticProductPreview = memo(function StaticProductPreview({
   selectedVariants,
   size = 96,
 }: StaticProductPreviewProps) {
+  const { active, progress } = useProgress();
   const colorVariant = getVariantById(
     product,
     "colors",
@@ -118,10 +120,10 @@ export const StaticProductPreview = memo(function StaticProductPreview({
 
   return (
     <div
-      className="rounded-lg overflow-hidden bg-linear-to-br from-gray-100 to-gray-200"
+      className="relative rounded-lg overflow-hiddens"
       style={{ width: size + 100, height: size + 100 }}
       role="img"
-      aria-label={`3D preview of ${product.name} in ${colorVariant?.name || 'selected'} color`}
+      aria-label={`3D preview of ${product.name} in ${colorVariant?.name || "selected"} color`}
     >
       <Canvas
         camera={{ position: [3.5, 1, 2], fov: 45 }}
@@ -137,6 +139,13 @@ export const StaticProductPreview = memo(function StaticProductPreview({
           <Environment preset="city" environmentIntensity={0.3} />
         </Suspense>
       </Canvas>
+
+      {/* Loading overlay */}
+      {(active || progress < 100) && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Spinner size="lg" />
+        </div>
+      )}
     </div>
   );
 });

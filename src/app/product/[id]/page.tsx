@@ -15,6 +15,7 @@ import { PriceSummary } from "@/components/customizer/PriceSummary";
 import { ConfiguratorSkeleton } from "@/components/ui/Skeleton";
 import { isVariantIncompatible } from "@/lib/validation";
 import { Badge } from "@/components/ui/Badge";
+import { MobileBackButton } from "@/components/ui/MobileBackButton";
 
 export default function ProductPage() {
   const params = useParams();
@@ -157,25 +158,28 @@ export default function ProductPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <button
-          onClick={() => router.push("/")}
-          className="text-blue-600 hover:text-blue-700 font-medium mb-6 inline-flex items-center gap-2"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        <div className="flex items-center gap-3 mb-6">
+          <MobileBackButton fallbackHref="/products" />
+          <button
+            onClick={() => router.push("/products")}
+            className="hidden md:inline-flex text-blue-600 hover:text-blue-700 font-medium items-center gap-2"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Back to Products
-        </button>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back to Products
+          </button>
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           {/* 3D Viewer */}
